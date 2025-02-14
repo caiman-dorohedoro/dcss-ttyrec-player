@@ -1,0 +1,43 @@
+import React from 'react';
+import { XCircle } from 'lucide-react';
+
+interface PlaylistProps {
+  files: File[];
+  currentFileIndex: number;
+  onFileRemove: (index: number) => void;
+  onFileSelect: (index: number) => void;
+}
+
+const Playlist: React.FC<PlaylistProps> = ({ files, currentFileIndex, onFileRemove, onFileSelect }) => {
+  return (
+    <div className="w-full max-w-2xl mx-auto mb-4">
+      <h2 className="text-lg font-semibold mb-2">Playlist</h2>
+      {files.length > 0 ? (
+        <ul className="border rounded-md overflow-hidden">
+          {files.map((file, index) => (
+            <li
+              key={index}
+              className={`px-4 py-2 border-b last:border-b-0 cursor-pointer hover:bg-gray-100 ${currentFileIndex === index ? 'bg-blue-100' : ''} flex items-center justify-between`}
+              onClick={() => onFileSelect(index)}
+            >
+              <span className="truncate">{file.name}</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // 이벤트 버블링 방지
+                  onFileRemove(index);
+                }}
+                className="ml-2 text-gray-500 hover:text-gray-700"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500 text-center p-4">No files selected yet.</p>
+      )}
+    </div>
+  );
+};
+
+export default Playlist;

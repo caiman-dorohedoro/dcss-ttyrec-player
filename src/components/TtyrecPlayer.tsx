@@ -3,7 +3,7 @@ import * as AsciinemaPlayer from 'asciinema-player';
 import decompress from '@/lib/bz2'
 import 'asciinema-player/dist/bundle/asciinema-player.css';
 
-const TtyrecPlayer = ({ file }: { file: File }) => {
+const TtyrecPlayer = ({ file, onEnded }: { file: File, onEnded: () => void }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
@@ -35,6 +35,8 @@ const TtyrecPlayer = ({ file }: { file: File }) => {
           url: url,
           parser: 'ttyrec'
         }, containerRef.current);
+        
+        playerRef.current.addEventListener('ended', onEnded);
       } catch (error) {
         console.error('Error initializing player:', error);
       }
@@ -48,7 +50,7 @@ const TtyrecPlayer = ({ file }: { file: File }) => {
         playerRef.current = null;
       }
     };
-  }, [file]);
+  }, [file, onEnded]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">

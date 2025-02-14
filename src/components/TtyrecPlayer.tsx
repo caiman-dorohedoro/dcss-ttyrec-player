@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
-import { decompress } from 'bz2';
 import * as AsciinemaPlayer from 'asciinema-player';
+import decompress from '@/lib/bz2'
 import 'asciinema-player/dist/bundle/asciinema-player.css';
 
 const TtyrecPlayer = ({ file }: { file: File }) => {

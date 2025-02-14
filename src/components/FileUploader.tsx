@@ -61,7 +61,7 @@ const FileUploader = ({ onFileSelect }: { onFileSelect: (file: File) => void }) 
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
-          accept=".ttyrec,.ttyrec.bz2"
+          accept=".ttyrec,.bz2"
           className="hidden"
         />
       </div>

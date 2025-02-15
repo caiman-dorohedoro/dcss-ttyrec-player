@@ -18,7 +18,7 @@ const Playlist: React.FC<PlaylistProps> = ({ files, currentFileIndex, onFileRemo
           {files.map((file, index) => (
             <li
               key={index}
-              className={`max-w-[300px] px-4 py-2 border-b last:border-b-0 cursor-pointer hover:bg-gray-100 ${currentFileIndex === index ? 'bg-blue-100' : ''} flex items-center justify-between`}
+              className={`md:max-w-[300px] px-4 py-2 border-b last:border-b-0 cursor-pointer hover:bg-gray-100 ${currentFileIndex === index ? 'bg-blue-100' : ''} flex items-center justify-between`}
               onClick={() => onFileSelect(index)}
             >
               <span className="truncate">{file.name}</span>

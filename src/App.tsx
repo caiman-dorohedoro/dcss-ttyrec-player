@@ -39,22 +39,25 @@ const App = () => {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="relative mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6 text-center">TTYRec Player</h1>
       {!selectedFiles.length ? (
         <FileUploader onFileSelect={handleFilesSelect} />
       ) : (
         <>
+        <div className="flex">
+          <TtyrecPlayer
+            file={selectedFiles[currentFileIndex]}
+            onEnded={playNextFile}
+          />
           <Playlist
+            className="absolute -right-40"
             files={selectedFiles}
             currentFileIndex={currentFileIndex}
             onFileRemove={handleFileRemove}
             onFileSelect={(index) => setCurrentFileIndex(index)} 
           />
-          <TtyrecPlayer
-            file={selectedFiles[currentFileIndex]}
-            onEnded={playNextFile}
-          />
+        </div>
           <button
             onClick={() => setSelectedFiles([])}
             className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"

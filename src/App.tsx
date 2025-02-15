@@ -6,6 +6,20 @@ import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
 
+const shortcuts = [
+  { key: "space", description: "pause / resume" },
+  { key: "f", description: "toggle fullscreen mode" },
+  { key: "← / →", description: "rewind / fast-forward by 5 seconds" },
+  { key: "Shift + ← / →", description: "rewind / fast-forward by 10%" },
+  { key: "[ / ]", description: "jump to the previous / next marker" },
+  { key: "0-9", description: "jump to 0%, 10%, 20% ... 90%" },
+  {
+    key: ", / .",
+    description: "step back / forward, frame by frame (when paused)",
+  },
+  { key: "?", description: "toggle this help popup" },
+];
+
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
@@ -43,9 +57,9 @@ const App = () => {
   };
 
   return (
-    <div className="relative mx-auto md:py-8 py-4">
+    <div className="relative mx-auto xl:py-8 py-4">
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
-        <h1 className="md:text-2xl text-lg font-bold text-center">
+        <h1 className="xl:text-2xl text-lg font-bold text-center">
           Ttyrec Player
         </h1>
         {selectedFiles.length > 0 && (
@@ -61,19 +75,33 @@ const App = () => {
       {!selectedFiles.length ? (
         <FileUploader onFileSelect={handleFilesSelect} />
       ) : (
-        <>
+        <div className="flex flex-col items-center xl:grid xl:grid-cols-[1fr_300px] xl:items-start gap-4">
           <TtyrecPlayer
             file={selectedFiles[currentFileIndex]}
             onEnded={playNextFile}
           />
           <Playlist
-            className="md:absolute md:-right-40 md:top-7 mx-4 my-8"
             files={selectedFiles}
             currentFileIndex={currentFileIndex}
             onFileRemove={handleFileRemove}
             onFileSelect={(index) => setCurrentFileIndex(index)}
           />
-        </>
+        </div>
+      )}
+      {selectedFiles.length > 0 && (
+        <div className="mt-8 p-4 bg-gray-50 rounded-lg mx-auto hidden sm:block lg:max-w-[500px] xl:max-w-[896px]">
+          <h3 className="font-semibold mb-3">Keyboard shortcuts</h3>
+          <div className="space-y-2 grid grid-cols-2 gap-2 ">
+            {shortcuts.map((shortcut, index) => (
+              <div key={index} className="flex text-sm">
+                <kbd className="bg-gray-100 px-2 py-0.5 rounded mr-2 min-w-[80px] inline-block">
+                  {shortcut.key}
+                </kbd>
+                <span className="text-gray-600">{shortcut.description}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

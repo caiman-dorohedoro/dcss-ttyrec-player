@@ -1,31 +1,35 @@
-import { useState } from 'react'
-import './App.css'
-import TtyrecPlayer from './components/TtyrecPlayer'
-import FileUploader from './components/FileUploader'
-import Playlist from './components/\bPlaylist';
+import { useState } from "react";
+import "./App.css";
+import TtyrecPlayer from "./components/TtyrecPlayer";
+import FileUploader from "./components/FileUploader";
+import Playlist from "./components/Playlist";
+import { Button } from "./components/ui/button";
+import { RotateCcw } from "lucide-react";
 
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
-  
+
   const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
     setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
   };
-  
+
   const playNextFile = () => {
     if (currentFileIndex < selectedFiles.length - 1) {
       setCurrentFileIndex(currentFileIndex + 1);
     } else {
       // 마지막 파일 재생 완료 후 처리 (예: 재생 중지, 반복 재생 등)
-      console.log('Playlist finished');
+      console.log("Playlist finished");
       setCurrentFileIndex(0); // 예시: playlist finished 후 다시 처음 파일부터 재생
       setSelectedFiles([]); // 예시: playlist finished 후 파일 목록 초기화
     }
   };
-  
+
   const handleFileRemove = (indexToRemove: number) => {
-    const updatedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    const updatedFiles = selectedFiles.filter(
+      (_, index) => index !== indexToRemove
+    );
     setSelectedFiles(updatedFiles);
     if (indexToRemove === currentFileIndex) {
       if (updatedFiles.length > 0) {
@@ -39,8 +43,21 @@ const App = () => {
   };
 
   return (
-    <div className="relative mx-auto md:py-8 py-1">
-      <h1 className="md:text-2xl text-lg font-bold md:mb-6 my-2 text-center">TTYRec Player</h1>
+    <div className="relative mx-auto md:py-8 py-4">
+      <div className="mx-auto relative w-auto inline-flex items-center mb-4">
+        <h1 className="md:text-2xl text-lg font-bold text-center">
+          Ttyrec Player
+        </h1>
+        {selectedFiles.length > 0 && (
+          <Button
+            size="sm"
+            onClick={() => setSelectedFiles([])}
+            className="absolute -right-[95px] cursor-pointer hover:bg-gray-100"
+          >
+            <RotateCcw className="w-4 h-4" /> Reset
+          </Button>
+        )}
+      </div>
       {!selectedFiles.length ? (
         <FileUploader onFileSelect={handleFilesSelect} />
       ) : (
@@ -54,19 +71,12 @@ const App = () => {
             files={selectedFiles}
             currentFileIndex={currentFileIndex}
             onFileRemove={handleFileRemove}
-            onFileSelect={(index) => setCurrentFileIndex(index)} 
+            onFileSelect={(index) => setCurrentFileIndex(index)}
           />
-          <button
-            onClick={() => setSelectedFiles([])}
-            className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-          >
-            Upload Another File
-          </button>
         </>
       )}
     </div>
   );
 };
 
-
-export default App
+export default App;

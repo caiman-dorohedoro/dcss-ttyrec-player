@@ -1,8 +1,12 @@
-import { useState, useRef } from 'react';
-import { Upload } from 'lucide-react';
+import { useState, useRef } from "react";
+import { Upload } from "lucide-react";
 
 // FileUploader 컴포넌트
-const FileUploader = ({ onFileSelect }: { onFileSelect: (files: File[]) => void }) => {
+const FileUploader = ({
+  onFileSelect,
+}: {
+  onFileSelect: (files: File[]) => void;
+}) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,19 +25,23 @@ const FileUploader = ({ onFileSelect }: { onFileSelect: (files: File[]) => void 
     const files = e.dataTransfer.files;
     handleFiles(Array.from(files));
   };
-  
-  const handleFiles = (files: File[]) => { // files: File[] 타입으로 변경
+
+  const handleFiles = (files: File[]) => {
+    // files: File[] 타입으로 변경
     if (!files || files.length === 0) return; // files 가 비어있는 경우 처리
 
-    const validFiles = files.filter(file => file.name.endsWith('.ttyrec') || file.name.endsWith('.ttyrec.bz2')); // 유효한 파일만 필터링
-    if (validFiles.length !== files.length) { // 유효하지 않은 파일이 있는 경우 alert 표시
-      alert('Please upload .ttyrec or .ttyrec.bz2 files only.');
+    const validFiles = files.filter(
+      (file) =>
+        file.name.endsWith(".ttyrec") || file.name.endsWith(".ttyrec.bz2")
+    ); // 유효한 파일만 필터링
+    if (validFiles.length !== files.length) {
+      // 유효하지 않은 파일이 있는 경우 alert 표시
+      alert("Please upload .ttyrec or .ttyrec.bz2 files only.");
       return;
     }
 
     onFileSelect(validFiles); // 유효한 파일들만 onFileSelect 으로 전달
   };
-
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -45,7 +53,7 @@ const FileUploader = ({ onFileSelect }: { onFileSelect: (files: File[]) => void 
     <div className="w-full max-w-2xl mx-auto p-6">
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+          ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -53,10 +61,12 @@ const FileUploader = ({ onFileSelect }: { onFileSelect: (files: File[]) => void 
       >
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <p className="mt-2 text-sm text-gray-600">
-          Drag and drop your TTYRec file here, or click to select
+          TTYRec 파일을 드래그앤드롭하거나 클릭하여 선택해주세요.
+          {/* Drag and drop your TTYRec file here, or click to select */}
         </p>
         <p className="mt-1 text-xs text-gray-500">
-          Supports .ttyrec and .ttyrec.bz2 files
+          .ttyrec 및 .ttyrec.bz2 파일을 지원합니다.
+          {/* Supports .ttyrec and .ttyrec.bz2 files */}
         </p>
         <input
           type="file"

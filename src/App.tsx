@@ -7,17 +7,25 @@ import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
 
 const shortcuts = [
-  { key: "space", description: "pause / resume" },
-  { key: "f", description: "toggle fullscreen mode" },
-  { key: "← / →", description: "rewind / fast-forward by 5 seconds" },
-  { key: "Shift + ← / →", description: "rewind / fast-forward by 10%" },
-  { key: "[ / ]", description: "jump to the previous / next marker" },
-  { key: "0-9", description: "jump to 0%, 10%, 20% ... 90%" },
+  // { key: "space", description: "pause / resume" },
+  { key: "space", description: "플레이 / 정지" },
+  // { key: "f", description: "toggle fullscreen mode" },
+  { key: "f", description: "전체 화면 모드 전환" },
+  // { key: "← / →", description: "rewind / fast-forward by 5 seconds" },
+  { key: "← / →", description: "5초 뒤로 / 5초 앞으로" },
+  // { key: "Shift + ← / →", description: "rewind / fast-forward by 10%" },
+  { key: "Shift + ← / →", description: "10% 뒤로 / 10% 앞으로" },
+  // { key: "[ / ]", description: "jump to the previous / next marker" },
+  { key: "[ / ]", description: "이전 / 다음 마크로 이동" },
+  // { key: "0-9", description: "jump to 0%, 10%, 20% ... 90%" },
+  { key: "0-9", description: "0%, 10%, 20% ... 90%로 이동" },
+  // { key: ", / .", description: "step back / forward, frame by frame (when paused)" },
   {
     key: ", / .",
-    description: "step back / forward, frame by frame (when paused)",
+    description: "(일시정지 상태에서) 프레임 단위로 뒤로 / 앞으로",
   },
-  { key: "?", description: "toggle this help popup" },
+  // { key: "?", description: "toggle this help popup" },
+  { key: "?", description: "도움말 표시 / 숨김" },
 ];
 
 const App = () => {
@@ -60,7 +68,8 @@ const App = () => {
     <div className="relative mx-auto xl:py-8 py-4">
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
-          Ttyrec Player
+          Ttyrec 플레이어
+          {/* Ttyrec Player */}
         </h1>
         {selectedFiles.length > 0 && (
           <Button
@@ -68,7 +77,7 @@ const App = () => {
             onClick={() => setSelectedFiles([])}
             className="absolute -right-[95px] cursor-pointer hover:bg-gray-100"
           >
-            <RotateCcw className="w-4 h-4" /> Reset
+            <RotateCcw className="w-4 h-4" /> 초기화{/* Reset */}
           </Button>
         )}
       </div>
@@ -90,7 +99,7 @@ const App = () => {
       )}
       {selectedFiles.length > 0 && (
         <div className="mt-8 p-4 bg-gray-50 rounded-lg mx-auto hidden sm:block lg:max-w-[500px] xl:max-w-[896px]">
-          <h3 className="font-semibold mb-3">Keyboard shortcuts</h3>
+          <h3 className="font-semibold mb-3">키보드 단축키</h3>
           <div className="space-y-2 grid grid-cols-2 gap-2 ">
             {shortcuts.map((shortcut, index) => (
               <div key={index} className="flex text-sm">

@@ -1,13 +1,20 @@
 import { useRef, useEffect } from "react";
-import * as AsciinemaPlayer from 'asciinema-player';
-import decompress from '@/lib/bz2'
-import 'asciinema-player/dist/bundle/asciinema-player.css';
+import * as AsciinemaPlayer from "asciinema-player";
+import "asciinema-player/dist/bundle/asciinema-player.css";
+import useBz2DecompressWorker from "@/hooks/useBz2DecompressWorker";
 
-const TtyrecPlayer = ({ file, onEnded }: { file: File, onEnded: () => void }) => {
+const TtyrecPlayer = ({
+  file,
+  onEnded,
+}: {
+  file: File;
+  onEnded: () => void;
+}) => {
+  const { result, decompressFile } = useBz2DecompressWorker();
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
-  
+
   useEffect(() => {
     const initPlayer = async () => {
       if (!file || !containerRef.current) return;
@@ -18,27 +25,34 @@ const TtyrecPlayer = ({ file, onEnded }: { file: File, onEnded: () => void }) =>
         playerRef.current = null;
       }
 
-      try {
-        const isCompressed = file.name.endsWith('.bz2');
-        let url: string;
-        
-        if (isCompressed) {
-          const fileData = await file.arrayBuffer();
-          const decompressed = decompress(new Uint8Array(fileData));
-          const blob = new Blob([decompressed], { type: 'application/octet-stream' });
-          url = URL.createObjectURL(blob);
-        } else {
-          url = URL.createObjectURL(file);
+      const isCompressed = file.name.endsWith(".bz2");
+
+      if (!isCompressed) {
+        try {
+          const url = URL.createObjectURL(file);
+
+          playerRef.current = AsciinemaPlayer.create(
+            {
+              url,
+              parser: "ttyrec",
+            },
+            containerRef.current
+          );
+
+          playerRef.current.addEventListener("ended", onEnded);
+        } catch (error) {
+          console.error("Error decompressing file:", error);
         }
-        
-        playerRef.current = AsciinemaPlayer.create({
-          url: url,
-          parser: 'ttyrec'
-        }, containerRef.current);
-        
-        playerRef.current.addEventListener('ended', onEnded);
-      } catch (error) {
-        console.error('Error initializing player:', error);
+
+        return;
+      }
+
+      if (isCompressed) {
+        try {
+          decompressFile(file);
+        } catch (error) {
+          console.error("Error decompressing file:", error);
+        }
       }
     };
 
@@ -50,7 +64,23 @@ const TtyrecPlayer = ({ file, onEnded }: { file: File, onEnded: () => void }) =>
         playerRef.current = null;
       }
     };
-  }, [file, onEnded]);
+  }, [file, onEnded, decompressFile]);
+
+  useEffect(() => {
+    if (result) {
+      const url = URL.createObjectURL(result);
+
+      playerRef.current = AsciinemaPlayer.create(
+        {
+          url,
+          parser: "ttyrec",
+        },
+        containerRef.current
+      );
+
+      playerRef.current.addEventListener("ended", onEnded);
+    }
+  }, [result, onEnded]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">

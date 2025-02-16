@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
 import TtyrecPlayer from "./components/TtyrecPlayer";
 import FileUploader from "./components/FileUploader";
 import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
-import { db } from "./lib/db";
 
 const shortcuts = [
   { key: "space", description: "pause / resume" },
@@ -24,71 +23,10 @@ const shortcuts = [
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
-  const [currentPosition, setCurrentPosition] = useState<number>(0);
 
-  // 초기 로딩 시 저장된 파일들 불러오기
-  useEffect(() => {
-    const loadSavedFiles = async () => {
-      try {
-        const savedFiles = await db.getFiles();
-        if (savedFiles.length > 0) {
-          setSelectedFiles(
-            savedFiles.map((file) => new File([file.blob], file.name))
-          );
-          setCurrentPosition(savedFiles[0].lastPosition);
-        }
-      } catch (error) {
-        console.error("Error loading saved files:", error);
-      }
-    };
-
-    loadSavedFiles();
-  }, []);
-
-  const handleFilesSelect = async (files: File[]) => {
+  const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
-    setCurrentFileIndex(0);
-
-    // 새로운 파일들을 DB에 저장
-    for (const file of files) {
-      await db.saveFile(file);
-    }
-  };
-
-  const handlePositionUpdate = async (position: number) => {
-    if (selectedFiles[currentFileIndex]) {
-      await db.updatePosition(selectedFiles[currentFileIndex].name, position);
-    }
-  };
-
-  const handleFileRemove = async (indexToRemove: number) => {
-    const fileToRemove = selectedFiles[indexToRemove];
-    await db.removeFile(fileToRemove.name);
-
-    const updatedFiles = selectedFiles.filter(
-      (_, index) => index !== indexToRemove
-    );
-    setSelectedFiles(updatedFiles);
-
-    if (indexToRemove === currentFileIndex) {
-      if (updatedFiles.length > 0) {
-        setCurrentFileIndex(0);
-      } else {
-        setSelectedFiles([]);
-      }
-    } else if (indexToRemove < currentFileIndex) {
-      setCurrentFileIndex(currentFileIndex - 1);
-    }
-  };
-
-  const handleReset = async () => {
-    // 모든 파일 제거
-    for (const file of selectedFiles) {
-      await db.removeFile(file.name);
-    }
-    setSelectedFiles([]);
-    setCurrentFileIndex(0);
-    setCurrentPosition(0);
+    setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
   };
 
   const playNextFile = () => {
@@ -102,6 +40,22 @@ const App = () => {
     }
   };
 
+  const handleFileRemove = (indexToRemove: number) => {
+    const updatedFiles = selectedFiles.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setSelectedFiles(updatedFiles);
+    if (indexToRemove === currentFileIndex) {
+      if (updatedFiles.length > 0) {
+        setCurrentFileIndex(0); // 삭제된 파일이 현재 파일이면, 다음 파일 (또는 첫 번째 파일) 재생
+      } else {
+        setSelectedFiles([]); // 파일 모두 삭제되면 selectedFiles 초기화
+      }
+    } else if (indexToRemove < currentFileIndex) {
+      setCurrentFileIndex(currentFileIndex - 1); // 현재 index 조정
+    }
+  };
+
   return (
     <div className="relative mx-auto xl:py-8 py-4">
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
@@ -111,7 +65,7 @@ const App = () => {
         {selectedFiles.length > 0 && (
           <Button
             size="sm"
-            onClick={handleReset}
+            onClick={() => setSelectedFiles([])}
             className="absolute -right-[95px] cursor-pointer hover:bg-gray-100"
           >
             <RotateCcw className="w-4 h-4" /> Reset
@@ -125,8 +79,6 @@ const App = () => {
           <TtyrecPlayer
             file={selectedFiles[currentFileIndex]}
             onEnded={playNextFile}
-            initialPosition={currentPosition}
-            onPositionUpdate={handlePositionUpdate}
           />
           <Playlist
             files={selectedFiles}
@@ -137,7 +89,7 @@ const App = () => {
         </div>
       )}
       {selectedFiles.length > 0 && (
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg mx-auto hidden sm:block lg:w-[500px] lg:max-w-[500px] xl:w-[896px] xl:max-w-[896px]">
+        <div className="mt-8 p-4 bg-gray-50 rounded-lg mx-auto hidden sm:block lg:max-w-[500px] xl:max-w-[896px]">
           <h3 className="font-semibold mb-3">Keyboard shortcuts</h3>
           <div className="space-y-2 grid grid-cols-2 gap-2 ">
             {shortcuts.map((shortcut, index) => (

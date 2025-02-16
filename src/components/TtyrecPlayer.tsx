@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import * as AsciinemaPlayer from "asciinema-player";
 import "asciinema-player/dist/bundle/asciinema-player.css";
 import useBz2DecompressWorker from "@/hooks/useBz2DecompressWorker";
+import { States } from "@/types/decompressWorker";
 
 const TtyrecPlayer = ({
   file,
@@ -10,7 +11,7 @@ const TtyrecPlayer = ({
   file: File;
   onEnded: () => void;
 }) => {
-  const { result, decompressFile } = useBz2DecompressWorker();
+  const { result, status, decompressFile } = useBz2DecompressWorker();
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
@@ -67,24 +68,46 @@ const TtyrecPlayer = ({
   }, [file, onEnded, decompressFile]);
 
   useEffect(() => {
-    if (result) {
-      const url = URL.createObjectURL(result);
+    if (!result) return;
 
-      playerRef.current = AsciinemaPlayer.create(
-        {
-          url,
-          parser: "ttyrec",
-        },
-        containerRef.current
-      );
-
-      playerRef.current.addEventListener("ended", onEnded);
+    if (playerRef.current) {
+      playerRef.current.dispose();
+      playerRef.current = null;
     }
+
+    const url = URL.createObjectURL(result);
+
+    playerRef.current = AsciinemaPlayer.create(
+      {
+        url,
+        parser: "ttyrec",
+      },
+      containerRef.current
+    );
+
+    playerRef.current.addEventListener("ended", onEnded);
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.dispose();
+        playerRef.current = null;
+      }
+    };
   }, [result, onEnded]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div ref={containerRef} className="bg-black rounded-lg overflow-hidden" />
+      {status === States.DECOMPRESSING && (
+        <div className="bg-gray-100 max-w-[896px] mx-auto rounded-lg p-4">
+          <p>Decompressing...</p>
+        </div>
+      )}
+      {status !== States.DECOMPRESSING && (
+        <div
+          ref={containerRef}
+          className="bg-black rounded-lg overflow-hidden"
+        />
+      )}
     </div>
   );
 };

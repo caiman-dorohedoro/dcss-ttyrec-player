@@ -6,6 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
@@ -36,6 +46,8 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
     search,
   } = useSearchWorker();
   const [searchText, setSearchText] = useState("");
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
+  const [pendingSearch, setPendingSearch] = useState(false);
 
   const handleTimestampClick = (timestamp: number) => {
     if (playerRef.current) {
@@ -43,10 +55,29 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
     }
   };
 
+  const isSearchTextValid = (text: string): boolean => {
+    const trimmedText = text.trim();
+    return trimmedText.length > 2;
+  };
+
   const handleSearchClick = async () => {
     if (file === null) return;
+
+    if (!isSearchTextValid(searchText)) {
+      setShowWarningDialog(true);
+      setPendingSearch(true);
+      return;
+    }
+
+    executeSearch();
+  };
+
+  const executeSearch = async () => {
+    if (file === null) return;
+
     const buffer = await file.arrayBuffer();
     await search(buffer, searchText || "ready to make a new sacrifice");
+    setPendingSearch(false);
   };
 
   const placeholder =
@@ -84,6 +115,41 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
           검색
         </Button>
       </div>
+
+      <AlertDialog open={showWarningDialog} onOpenChange={setShowWarningDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>검색어 확인</AlertDialogTitle>
+            <AlertDialogDescription>
+              검색어가 비어있거나 너무 짧아 검색에 오래 걸릴 수 있습니다 (3글자
+              이상 권장). 계속 진행하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="hover:cursor-pointer"
+              onClick={() => {
+                setPendingSearch(false);
+                setShowWarningDialog(false);
+              }}
+            >
+              취소
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="hover:cursor-pointer"
+              onClick={() => {
+                setShowWarningDialog(false);
+                if (pendingSearch) {
+                  executeSearch();
+                }
+              }}
+            >
+              계속하기
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {searchStatus === SearchStates.SEARCHING && (
         <Card className="p-4 rounded-sm flex items-center justify-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />

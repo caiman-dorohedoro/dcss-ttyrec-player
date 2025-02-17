@@ -2,7 +2,6 @@ export enum States {
   INIT = "INIT",
   DECOMPRESSING = "DECOMPRESSING",
   COMPLETED = "COMPLETED",
-  SEARCHING = "SEARCHING",
   ERROR = "ERROR",
 }
 

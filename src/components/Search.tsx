@@ -4,6 +4,7 @@ import { States } from "@/types/decompressWorker";
 import { States as SearchStates } from "@/types/searchWorker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
@@ -57,24 +58,40 @@ const Search = ({ playerRef, file }: SearchProps) => {
             searchStatus === SearchStates.SEARCHING
           }
           onChange={(e) => setSearchText(e.target.value)}
+          placeholder="검색어를 입력하세요..."
         />
-        <Button className="hover:cursor-pointer" onClick={handleSearchClick}>
+        <Button
+          variant="default"
+          className="hover:cursor-pointer"
+          onClick={handleSearchClick}
+          disabled={
+            status === States.DECOMPRESSING ||
+            searchStatus === SearchStates.SEARCHING
+          }
+        >
           검색
         </Button>
       </div>
+
       {searchResult && searchResult.length > 0 && (
-        <div className="flex flex-col gap-2 text-start">
+        <div className="flex flex-col gap-2">
           {searchResult.map((result) => (
-            <div
-              className="flex gap-2 border hover:bg-gray-100"
+            <Card
               key={result.frame}
-              onClick={() => {
-                handleTimestampClick(result.relativeTimestamp.time);
-              }}
+              className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer"
+              onClick={() =>
+                handleTimestampClick(result.relativeTimestamp.time)
+              }
             >
-              <div>{timeFormatter(result.relativeTimestamp.time)}</div>
-              <div>{result.textSnippet}</div>
-            </div>
+              <div className="flex items-start gap-2">
+                <span className="text-sm text-left text-muted-foreground min-w-[50px]">
+                  {timeFormatter(result.relativeTimestamp.time)}
+                </span>
+                <p className="text-sm text-left leading-relaxed">
+                  {result.textSnippet}
+                </p>
+              </div>
+            </Card>
           ))}
         </div>
       )}

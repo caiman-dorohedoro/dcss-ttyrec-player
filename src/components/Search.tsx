@@ -10,6 +10,22 @@ type SearchProps = {
   file: Blob | File | null;
 };
 
+const timeFormatter = (time: number) => {
+  const hours = Math.floor(time / 3600);
+  const minutes = Math.floor((time % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, "0");
+
+  if (hours > 0) {
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  return `${minutes}:${seconds}`;
+};
+
 const Search = ({ playerRef, file }: SearchProps) => {
   const {
     status: searchStatus,
@@ -56,7 +72,7 @@ const Search = ({ playerRef, file }: SearchProps) => {
                 handleTimestampClick(result.relativeTimestamp.time);
               }}
             >
-              <div>{result.relativeTimestamp.time}</div>
+              <div>{timeFormatter(result.relativeTimestamp.time)}</div>
               <div>{result.textSnippet}</div>
             </div>
           ))}

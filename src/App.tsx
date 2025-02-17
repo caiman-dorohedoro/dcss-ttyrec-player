@@ -161,7 +161,11 @@ const App = () => {
               />
             </TabsContent>
             <TabsContent value="search">
-              <Search playerRef={playerRef} file={safeFile} />
+              <Search
+                playerRef={playerRef}
+                file={safeFile}
+                decompressStatus={status}
+              />
             </TabsContent>
           </Tabs>
         </div>

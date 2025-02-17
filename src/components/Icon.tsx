@@ -17,11 +17,11 @@ const Icon = () => {
   const chars = ["@", ".", ".", ".", " "];
 
   return (
-    <h1 className="xl:text-2xl text-lg font-bold text-center">
+    <>
       {chars.map((char, index) => (
         <Char key={index} char={char} isDark={index === 3} />
       ))}
-    </h1>
+    </>
   );
 };
 

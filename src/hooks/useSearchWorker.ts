@@ -5,6 +5,8 @@ import { TtyrecSearchResult } from "@/lib/search";
 
 // relativeTimestamp.time의 차이가 1초 미만인 경우 하나의 결과로 병합
 const simplifySearchResult = (result: TtyrecSearchResult[]) => {
+  if (result.length === 0) return [];
+
   const simplified = [];
   let current = result[0];
   for (let i = 1; i < result.length; i++) {

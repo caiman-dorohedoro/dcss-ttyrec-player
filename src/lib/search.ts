@@ -74,7 +74,6 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
     const payload = uint8Array.slice(offset, offset + len);
     offset += len;
 
-    // console.log("payload", payload);
     // 페이로드를 문자열로 변환 (VT100 제어문자가 포함될 수 있음)
     const payloadStr = new TextDecoder().decode(payload);
     const strippedPayloadStr = stripAll(payloadStr);

@@ -4,6 +4,9 @@ import "asciinema-player/dist/bundle/asciinema-player.css";
 import useBz2DecompressWorker from "@/hooks/useBz2DecompressWorker";
 import { States } from "@/types/decompressWorker";
 import useSearchWorker from "@/hooks/useSearchWorker";
+import { States as SearchStates } from "@/types/searchWorker";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const TtyrecPlayer = ({
   file,
@@ -13,12 +16,15 @@ const TtyrecPlayer = ({
   onEnded: () => void;
 }) => {
   const { result, status, decompressFile } = useBz2DecompressWorker();
-  const { result: searchResult, search } = useSearchWorker();
+  const {
+    status: searchStatus,
+    result: searchResult,
+    search,
+  } = useSearchWorker();
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
   const [searchText, setSearchText] = useState("");
-  const [goTimestamp, setGoTimestamp] = useState<number>(0);
 
   const handleTimestampClick = (timestamp: number) => {
     if (playerRef.current) {
@@ -137,33 +143,18 @@ const TtyrecPlayer = ({
       )}
       <div className="flex gap-4 p-2">
         <div className="flex gap-2">
-          <input
-            className="border border-gray-300 rounded-md p-2"
+          <Input
             type="text"
             value={searchText}
+            disabled={
+              status === States.DECOMPRESSING ||
+              searchStatus === SearchStates.SEARCHING
+            }
             onChange={(e) => setSearchText(e.target.value)}
           />
-          <button
-            className="border border-gray-300 rounded-md p-2"
-            onClick={handleSearchClick}
-          >
+          <Button className="hover:cursor-pointer" onClick={handleSearchClick}>
             검색
-          </button>
-        </div>
-        <div className="flex gap-2">
-          <input
-            className="border border-gray-300 rounded-md p-2"
-            type="number"
-            name=""
-            id=""
-            onChange={(e) => setGoTimestamp(Number(e.target.value))}
-          />
-          <button
-            className="border border-gray-300 rounded-md p-2"
-            onClick={() => handleTimestampClick(goTimestamp)}
-          >
-            바로가기
-          </button>
+          </Button>
         </div>
       </div>
       {searchResult && searchResult.length > 0 && (

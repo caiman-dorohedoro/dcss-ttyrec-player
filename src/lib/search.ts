@@ -1,3 +1,33 @@
+import stripAnsi from "strip-ansi";
+
+const stripAsciiControlCharacters = (str: string) => {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[\x00-\x1F\x7F]/g, "");
+};
+
+const stripDCSSSpecificCharacters = (str: string) => {
+  // # - wall
+  // . - floor
+  // ^ - trap
+  return str.replace(/[.#]/g, "");
+};
+
+const stripNoiseChars = (str: string) => {
+  return str.replace(/\[\d+d/g, "");
+};
+
+const trim = (str: string) => {
+  return str.replace(/^\s+|\s+$/g, "");
+};
+
+const stripAll = (str: string) => {
+  return trim(
+    stripDCSSSpecificCharacters(
+      stripAsciiControlCharacters(stripAnsi(stripNoiseChars(str)))
+    )
+  );
+};
+
 export type TtyrecSearchResult = {
   frame: number;
   timestamp: { sec: number; usec: number };
@@ -39,7 +69,6 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
     const relativeUsec = usec - firstTimestamp.usec;
     const relativeTime = relativeSec + relativeUsec / 1e6;
 
-    console.log(offset + len > uint8Array.length);
     // 페이로드가 충분한지 확인
     if (offset + len > uint8Array.length) break;
     const payload = uint8Array.slice(offset, offset + len);
@@ -48,8 +77,13 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
     // console.log("payload", payload);
     // 페이로드를 문자열로 변환 (VT100 제어문자가 포함될 수 있음)
     const payloadStr = new TextDecoder().decode(payload);
-    console.log("payloadStr", payloadStr);
-    if (payloadStr.includes(searchText)) {
+    const strippedPayloadStr = stripAll(payloadStr);
+
+    if (
+      strippedPayloadStr &&
+      strippedPayloadStr.length >= searchText.length &&
+      strippedPayloadStr.includes(searchText)
+    ) {
       results.push({
         frame: frameIndex,
         timestamp: { sec, usec },
@@ -65,23 +99,5 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
   }
   return results;
 }
-
-// // 사용 예제
-// const filePath = "path/to/your/ttyrec"; // ttyrec 파일 경로
-// const searchText = "찾고자 하는 텍스트";
-// const foundFrames = searchTtyrec(filePath, searchText);
-
-// if (foundFrames.length > 0) {
-//   console.log("검색된 프레임:");
-//   foundFrames.forEach((result) => {
-//     console.log(
-//       `프레임 ${result.frame} (타임스탬프: ${result.timestamp.sec}.${result.timestamp.usec})`
-//     );
-//     console.log("내용 미리보기:", result.textSnippet);
-//   });
-// } else {
-//   console.log("해당 텍스트를 포함한 프레임이 없습니다.");
-// }
-//
 
 export default searchTtyrec;

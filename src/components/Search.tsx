@@ -87,6 +87,15 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
       )}
       {searchStatus === SearchStates.COMPLETED &&
         searchResult &&
+        searchResult.length === 0 && (
+          <Card className="p-4 rounded-sm flex items-center justify-center gap-2">
+            <p className="text-sm text-muted-foreground">
+              검색 결과가 없습니다.
+            </p>
+          </Card>
+        )}
+      {searchStatus === SearchStates.COMPLETED &&
+        searchResult &&
         searchResult.length > 0 && (
           <div className="flex flex-col gap-2">
             {searchResult.map((result) => (

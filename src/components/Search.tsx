@@ -56,7 +56,10 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
   };
 
   const isSearchTextValid = (text: string): boolean => {
+    if (!text) return true; // 기본 설정 검색어 "ready to make a new sacrifice"가 있으므로 허용
+
     const trimmedText = text.trim();
+
     return trimmedText.length > 2;
   };
 

@@ -102,25 +102,28 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
       {searchStatus === SearchStates.COMPLETED &&
         searchResult &&
         searchResult.length > 0 && (
-          <div className="flex flex-col gap-2">
-            {searchResult.map((result) => (
-              <Card
-                key={result.frame}
-                className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer break-all"
-                onClick={() =>
-                  handleTimestampClick(result.relativeTimestamp.time)
-                }
-              >
-                <div className="flex items-start gap-2">
-                  <span className="text-sm text-left text-muted-foreground min-w-[50px]">
-                    {timeFormatter(result.relativeTimestamp.time)}
-                  </span>
-                  <p className="text-sm text-left leading-relaxed">
-                    {result.textSnippet}
-                  </p>
-                </div>
-              </Card>
-            ))}
+          <div className="relative">
+            <div className="flex flex-col gap-2 max-h-[546px] overflow-y-auto scrollbar-thin scrollbar-thumb-accent scrollbar-track-transparent pb-4">
+              {searchResult.map((result) => (
+                <Card
+                  key={result.frame}
+                  className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer break-all"
+                  onClick={() =>
+                    handleTimestampClick(result.relativeTimestamp.time)
+                  }
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-left text-muted-foreground min-w-[50px]">
+                      {timeFormatter(result.relativeTimestamp.time)}
+                    </span>
+                    <p className="text-sm text-left leading-relaxed">
+                      {result.textSnippet}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
           </div>
         )}
     </div>

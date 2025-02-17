@@ -1,13 +1,15 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useImperativeHandle, RefObject } from "react";
 import * as AsciinemaPlayer from "asciinema-player";
 import "asciinema-player/dist/bundle/asciinema-player.css";
 import { States } from "@/types/decompressWorker";
 
 const TtyrecPlayer = ({
+  ref,
   file,
   status,
   onEnded,
 }: {
+  ref: RefObject<{ seek: (timestamp: number) => void }>;
   file: File | Blob | null;
   status: States;
   onEnded: () => void;
@@ -15,6 +17,18 @@ const TtyrecPlayer = ({
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
+
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        seek(timestamp: number) {
+          playerRef.current?.seek(timestamp);
+        },
+      };
+    },
+    []
+  );
 
   useEffect(() => {
     const initPlayer = async () => {

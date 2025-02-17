@@ -1,11 +1,16 @@
-import { useEffect, useState } from "react";
+import { RefObject, useState } from "react";
 import useSearchWorker from "@/hooks/useSearchWorker";
 import { States } from "@/types/decompressWorker";
 import { States as SearchStates } from "@/types/searchWorker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const TtyrecPlayer = ({ file }: { file: File; onEnded: () => void }) => {
+type SearchProps = {
+  playerRef: RefObject<{ seek: (timestamp: number) => void }>;
+  file: Blob | File | null;
+};
+
+const Search = ({ playerRef, file }: SearchProps) => {
   const {
     status: searchStatus,
     result: searchResult,
@@ -13,26 +18,16 @@ const TtyrecPlayer = ({ file }: { file: File; onEnded: () => void }) => {
   } = useSearchWorker();
   const [searchText, setSearchText] = useState("");
 
-  // const handleTimestampClick = (timestamp: number) => {
-  //   if (playerRef.current) {
-  //     playerRef.current.seek(timestamp);
-  //   }
-  // };
+  const handleTimestampClick = (timestamp: number) => {
+    if (playerRef.current) {
+      playerRef.current.seek(timestamp);
+    }
+  };
 
   const handleSearchClick = async () => {
-    const isCompressed = file.name.endsWith(".bz2");
-
-    if (isCompressed && result === null) {
-      return;
-    }
-
-    if (isCompressed && result) {
-      const buffer = await result?.arrayBuffer();
-      await search(buffer, searchText);
-    } else {
-      const buffer = await file.arrayBuffer();
-      await search(buffer, searchText);
-    }
+    if (file === null) return;
+    const buffer = await file.arrayBuffer();
+    await search(buffer, searchText);
   };
 
   return (
@@ -73,4 +68,4 @@ const TtyrecPlayer = ({ file }: { file: File; onEnded: () => void }) => {
   );
 };
 
-export default TtyrecPlayer;
+export default Search;

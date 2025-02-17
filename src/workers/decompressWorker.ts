@@ -1,5 +1,5 @@
 import decompress from "../lib/bz2";
-import { State, States, Message } from "../types/decompressWorker";
+import { State, States, Message, MessageType } from "../types/decompressWorker";
 
 const postMessage = (message: Message) => {
   self.postMessage(message);
@@ -7,7 +7,7 @@ const postMessage = (message: Message) => {
 
 const updateState = (state: State) => {
   postMessage({
-    type: "status",
+    type: MessageType.STATUS,
     status: state,
   });
 };
@@ -30,7 +30,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
 
       // 결과 전송
       postMessage({
-        type: "data",
+        type: MessageType.DATA,
         data: blob,
       });
 
@@ -42,7 +42,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
     updateState(States.ERROR);
 
     postMessage({
-      type: "error",
+      type: MessageType.ERROR,
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

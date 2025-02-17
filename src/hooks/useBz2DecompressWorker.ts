@@ -1,4 +1,4 @@
-import { Message, State, States } from "@/types/decompressWorker";
+import { Message, MessageType, State, States } from "@/types/decompressWorker";
 import { useState, useCallback, useEffect } from "react";
 import DecompressWorker from "@/workers/decompressWorker?worker";
 
@@ -15,16 +15,24 @@ const useBz2DecompressWorker = () => {
   useEffect(() => {
     const w = new DecompressWorker();
 
-    w.onmessage = (e) => {
-      const { type, status, data, error } = e.data as Message;
+    w.onmessage = (e: MessageEvent<Message>) => {
+      if (e.data.type === MessageType.STATUS) {
+        setStatus(e.data.status);
 
-      if (type === "status") {
-        setStatus(status as State);
-      } else if (type === "data") {
-        setResult(data || null);
-      } else if (type === "error") {
+        return;
+      }
+
+      if (e.data.type === MessageType.DATA) {
+        setResult(e.data.data || null);
+
+        return;
+      }
+
+      if (e.data.type === MessageType.ERROR) {
         setStatus(States.ERROR);
-        setError(error || null);
+        setError(e.data.error || null);
+
+        return;
       }
     };
 
@@ -42,7 +50,8 @@ const useBz2DecompressWorker = () => {
         setError(null);
 
         postMessage(worker, {
-          type: "decompress",
+          type: MessageType.DECOMPRESS,
+          name: file.name,
           data: file,
         });
       } catch (err) {

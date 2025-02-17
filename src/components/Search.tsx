@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
   file: Blob | File | null;
+  decompressStatus: States;
 };
 
 const timeFormatter = (time: number) => {
@@ -27,7 +28,7 @@ const timeFormatter = (time: number) => {
   return `${minutes}:${seconds}`;
 };
 
-const Search = ({ playerRef, file }: SearchProps) => {
+const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
   const {
     status: searchStatus,
     result: searchResult,
@@ -63,7 +64,7 @@ const Search = ({ playerRef, file }: SearchProps) => {
             searchStatus === SearchStates.SEARCHING
           }
           onChange={(e) => setSearchText(e.target.value)}
-          placeholder="검색어를 입력하세요..."
+          placeholder={placeholder}
         />
         <Button
           variant="default"

@@ -32,21 +32,19 @@ const Search = ({ playerRef, file }: SearchProps) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="flex gap-4 p-2">
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            value={searchText}
-            disabled={
-              status === States.DECOMPRESSING ||
-              searchStatus === SearchStates.SEARCHING
-            }
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-          <Button className="hover:cursor-pointer" onClick={handleSearchClick}>
-            검색
-          </Button>
-        </div>
+      <div className="flex gap-2 mb-2">
+        <Input
+          type="text"
+          value={searchText}
+          disabled={
+            status === States.DECOMPRESSING ||
+            searchStatus === SearchStates.SEARCHING
+          }
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+        <Button className="hover:cursor-pointer" onClick={handleSearchClick}>
+          검색
+        </Button>
       </div>
       {searchResult && searchResult.length > 0 && (
         <div className="flex flex-col gap-2 text-start">

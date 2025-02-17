@@ -44,8 +44,13 @@ const Search = ({ playerRef, file }: SearchProps) => {
   const handleSearchClick = async () => {
     if (file === null) return;
     const buffer = await file.arrayBuffer();
-    await search(buffer, searchText);
+    await search(buffer, searchText || "ready to make a new sacrifice");
   };
+
+  const placeholder =
+    decompressStatus === States.DECOMPRESSING
+      ? "압축 해제중..."
+      : "ready to make a new sacrifice";
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -54,7 +59,7 @@ const Search = ({ playerRef, file }: SearchProps) => {
           type="text"
           value={searchText}
           disabled={
-            status === States.DECOMPRESSING ||
+            decompressStatus === States.DECOMPRESSING ||
             searchStatus === SearchStates.SEARCHING
           }
           onChange={(e) => setSearchText(e.target.value)}
@@ -65,7 +70,7 @@ const Search = ({ playerRef, file }: SearchProps) => {
           className="hover:cursor-pointer"
           onClick={handleSearchClick}
           disabled={
-            status === States.DECOMPRESSING ||
+            decompressStatus === States.DECOMPRESSING ||
             searchStatus === SearchStates.SEARCHING
           }
         >

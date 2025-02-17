@@ -6,6 +6,8 @@ import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
 import Icon from "./components/Icon";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "./components/ui/input";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -89,12 +91,32 @@ const App = () => {
             file={selectedFiles[currentFileIndex]}
             onEnded={playNextFile}
           />
-          <Playlist
-            files={selectedFiles}
-            currentFileIndex={currentFileIndex}
-            onFileRemove={handleFileRemove}
-            onFileSelect={(index) => setCurrentFileIndex(index)}
-          />
+          <Tabs defaultValue="playlist">
+            <TabsList>
+              <TabsTrigger value="playlist" className="hover:cursor-pointer">
+                플레이리스트
+              </TabsTrigger>
+              <TabsTrigger value="search" className="hover:cursor-pointer">
+                검색
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="playlist">
+              <Playlist
+                files={selectedFiles}
+                currentFileIndex={currentFileIndex}
+                onFileRemove={handleFileRemove}
+                onFileSelect={(index) => setCurrentFileIndex(index)}
+              />
+            </TabsContent>
+            <TabsContent value="search">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Input placeholder="검색어를 입력하세요" />
+                  <Button>검색</Button>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
       {selectedFiles.length > 0 && (

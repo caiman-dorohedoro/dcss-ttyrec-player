@@ -18,8 +18,6 @@ const Playlist: React.FC<PlaylistProps> = ({
 }) => {
   return (
     <div className={className}>
-      <h2 className="text-lg font-semibold mb-2">플레이리스트</h2>
-      {/* <h2 className="text-lg font-semibold mb-2">Playlist</h2> */}
       {files.length > 0 ? (
         <ul className="border rounded-md overflow-hidden">
           {files.map((file, index) => (

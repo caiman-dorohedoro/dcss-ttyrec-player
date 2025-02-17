@@ -5,6 +5,7 @@ import FileUploader from "./components/FileUploader";
 import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
+import Icon from "./components/Icon";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -68,8 +69,7 @@ const App = () => {
     <div className="relative mx-auto xl:py-8 py-4">
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
-          Ttyrec 플레이어
-          {/* Ttyrec Player */}
+          <Icon />
         </h1>
         {selectedFiles.length > 0 && (
           <Button

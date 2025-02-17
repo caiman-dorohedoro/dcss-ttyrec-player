@@ -113,3 +113,9 @@ dark {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 }
+
+@layer components {
+  .mono-char {
+    @apply w-[1.01ch] font-['Consolas',_Menlo,_'Bitstream_Vera_Sans_Mono',_monospace,_'Powerline_Symbols'];
+  }
+}

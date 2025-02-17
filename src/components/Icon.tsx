@@ -8,10 +8,15 @@ export const ColorMaps = {
   fg: {
     black: "text-black",
     "#d9d9d9": "text-[#d9d9d9]",
+    "#ddaf3c": "text-[#ddaf3c]",
+    "#4ebf22": "text-[#4ebf22]",
+    "#26b0d7": "text-[#26b0d7]",
   },
   bg: {
     black: "bg-black",
     "#d9d9d9": "bg-[#d9d9d9]",
+    "#ddaf3c": "bg-[#ddaf3c]",
+    transparent: "bg-transparent",
   },
 };
 

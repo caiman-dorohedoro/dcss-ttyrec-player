@@ -3,6 +3,22 @@ import { useState, useCallback, useEffect } from "react";
 import SearchWorker from "@/workers/searchWorker?worker";
 import { TtyrecSearchResult } from "@/lib/search";
 
+// relativeTimestamp.time의 차이가 1초 미만인 경우 하나의 결과로 병합
+const simplifySearchResult = (result: TtyrecSearchResult[]) => {
+  const simplified = [];
+  let current = result[0];
+  for (let i = 1; i < result.length; i++) {
+    if (result[i].relativeTimestamp.time - current.relativeTimestamp.time < 1) {
+      continue;
+    } else {
+      simplified.push(current);
+      current = result[i];
+    }
+  }
+  simplified.push(current);
+  return simplified;
+};
+
 const postMessage = (worker: Worker, message: Message) => {
   worker.postMessage(message);
 };
@@ -24,7 +40,7 @@ const useBz2DecompressWorker = () => {
       }
 
       if (e.data.type === MessageType.DATA) {
-        setResult(e.data.data || null);
+        setResult(simplifySearchResult(e.data.data || []));
 
         return;
       }

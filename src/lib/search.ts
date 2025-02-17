@@ -81,7 +81,9 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
     if (
       strippedPayloadStr &&
       strippedPayloadStr.length >= searchText.length &&
-      strippedPayloadStr.includes(searchText)
+      strippedPayloadStr
+        .toLocaleLowerCase()
+        .includes(searchText.toLocaleLowerCase())
     ) {
       results.push({
         frame: frameIndex,

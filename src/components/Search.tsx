@@ -5,6 +5,7 @@ import { States as SearchStates } from "@/types/searchWorker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
@@ -78,29 +79,36 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
           검색
         </Button>
       </div>
-
-      {searchResult && searchResult.length > 0 && (
-        <div className="flex flex-col gap-2">
-          {searchResult.map((result) => (
-            <Card
-              key={result.frame}
-              className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer"
-              onClick={() =>
-                handleTimestampClick(result.relativeTimestamp.time)
-              }
-            >
-              <div className="flex items-start gap-2">
-                <span className="text-sm text-left text-muted-foreground min-w-[50px]">
-                  {timeFormatter(result.relativeTimestamp.time)}
-                </span>
-                <p className="text-sm text-left leading-relaxed">
-                  {result.textSnippet}
-                </p>
-              </div>
-            </Card>
-          ))}
-        </div>
+      {searchStatus === SearchStates.SEARCHING && (
+        <Card className="p-4 rounded-sm flex items-center justify-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <p className="text-sm text-muted-foreground">검색 중...</p>
+        </Card>
       )}
+      {searchStatus === SearchStates.COMPLETED &&
+        searchResult &&
+        searchResult.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {searchResult.map((result) => (
+              <Card
+                key={result.frame}
+                className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer"
+                onClick={() =>
+                  handleTimestampClick(result.relativeTimestamp.time)
+                }
+              >
+                <div className="flex items-start gap-2">
+                  <span className="text-sm text-left text-muted-foreground min-w-[50px]">
+                    {timeFormatter(result.relativeTimestamp.time)}
+                  </span>
+                  <p className="text-sm text-left leading-relaxed">
+                    {result.textSnippet}
+                  </p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
     </div>
   );
 };

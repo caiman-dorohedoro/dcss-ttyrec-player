@@ -43,7 +43,7 @@ const useBz2DecompressWorker = () => {
 
       if (e.data.type === MessageType.DATA) {
         setResult(simplifySearchResult(e.data.data || []));
-
+        setStatus(States.COMPLETED);
         return;
       }
 
@@ -67,6 +67,7 @@ const useBz2DecompressWorker = () => {
 
       try {
         setError(null);
+        setStatus(States.SEARCHING);
 
         postMessage(worker, {
           type: MessageType.SEARCH,

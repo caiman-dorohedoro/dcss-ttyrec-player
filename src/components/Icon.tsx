@@ -1,28 +1,51 @@
 interface CharProps {
   char: string;
-  isDark?: boolean;
+  fgColor?: string;
+  bgColor?: string;
 }
 
-const Char = ({ char, isDark = false }: CharProps) => (
-  <span
-    className={`mono-char ${
-      isDark ? "text-[#d9d9d9] bg-black" : "fg-black bg-[#d9d9d9]"
-    }`}
-  >
-    {char}
-  </span>
+export const ColorMaps = {
+  fg: {
+    black: "text-black",
+    "#d9d9d9": "text-[#d9d9d9]",
+  },
+  bg: {
+    black: "bg-black",
+    "#d9d9d9": "bg-[#d9d9d9]",
+  },
+};
+
+const Char = ({ char, fgColor, bgColor }: CharProps) => (
+  <span className={`mono-char ${fgColor} ${bgColor}`}>{char}</span>
 );
 
-const Icon = () => {
-  const chars = ["@", ".", ".", ".", " "];
+type DrawDCSSCharactersProps = {
+  chars: CharProps[];
+};
 
+const DrawDCSSCharacters = ({ chars }: DrawDCSSCharactersProps) => {
   return (
     <>
-      {chars.map((char, index) => (
-        <Char key={index} char={char} isDark={index === 3} />
-      ))}
+      {chars.map((char, index) => {
+        if (char.char === " ") {
+          return (
+            <span key={index} className="mono-char">
+              {" "}
+            </span>
+          );
+        }
+
+        return (
+          <Char
+            key={index}
+            char={char.char}
+            fgColor={char.fgColor}
+            bgColor={char.bgColor}
+          />
+        );
+      })}
     </>
   );
 };
 
-export default Icon;
+export default DrawDCSSCharacters;

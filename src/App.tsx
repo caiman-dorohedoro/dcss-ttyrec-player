@@ -5,7 +5,7 @@ import FileUploader from "./components/FileUploader";
 import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
-import Icon from "./components/Icon";
+import DrawDCSSCharacters, { ColorMaps } from "./components/Icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "./components/ui/input";
 
@@ -29,6 +29,29 @@ const shortcuts = [
   },
   // { key: "?", description: "toggle this help popup" },
   { key: "?", description: "도움말 표시 / 숨김" },
+];
+
+const logoChars = [
+  {
+    char: "@",
+    fgColor: ColorMaps.fg.black,
+    bgColor: ColorMaps.bg["#d9d9d9"],
+  },
+  {
+    char: ".",
+    fgColor: ColorMaps.fg.black,
+    bgColor: ColorMaps.bg["#d9d9d9"],
+  },
+  {
+    char: ".",
+    fgColor: ColorMaps.fg.black,
+    bgColor: ColorMaps.bg["#d9d9d9"],
+  },
+  {
+    char: ".",
+    fgColor: ColorMaps.fg["#d9d9d9"],
+    bgColor: ColorMaps.bg.black,
+  },
 ];
 
 const App = () => {
@@ -71,7 +94,7 @@ const App = () => {
     <div className="relative mx-auto xl:py-8 py-4">
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
-          <Icon />
+          <DrawDCSSCharacters chars={logoChars} />
         </h1>
         {selectedFiles.length > 0 && (
           <Button

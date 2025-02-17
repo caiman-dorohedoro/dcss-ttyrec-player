@@ -75,7 +75,7 @@ const App = () => {
           <Button
             size="sm"
             onClick={() => setSelectedFiles([])}
-            className="absolute -right-[95px] cursor-pointer hover:bg-gray-100"
+            className="absolute -right-[95px] cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" /> 초기화{/* Reset */}
           </Button>

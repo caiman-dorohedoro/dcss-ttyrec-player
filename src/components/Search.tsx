@@ -65,6 +65,11 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
             searchStatus === SearchStates.SEARCHING
           }
           onChange={(e) => setSearchText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearchClick();
+            }
+          }}
           placeholder={placeholder}
         />
         <Button
@@ -101,7 +106,7 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
             {searchResult.map((result) => (
               <Card
                 key={result.frame}
-                className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer"
+                className="p-2 rounded-sm hover:bg-accent transition-colors cursor-pointer break-all"
                 onClick={() =>
                   handleTimestampClick(result.relativeTimestamp.time)
                 }

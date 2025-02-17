@@ -2,6 +2,10 @@ import { Message, State, States } from "@/types/decompressWorker";
 import { useState, useCallback, useEffect } from "react";
 import DecompressWorker from "@/workers/decompressWorker?worker";
 
+const postMessage = (worker: Worker, message: Message) => {
+  worker.postMessage(message);
+};
+
 const useBz2DecompressWorker = () => {
   const [status, setStatus] = useState<State>(States.INIT);
   const [result, setResult] = useState<Blob | null>(null);
@@ -37,9 +41,9 @@ const useBz2DecompressWorker = () => {
       try {
         setError(null);
 
-        worker.postMessage({
+        postMessage(worker, {
           type: "decompress",
-          file,
+          data: file,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");

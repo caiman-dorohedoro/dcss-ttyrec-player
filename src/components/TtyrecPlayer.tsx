@@ -5,12 +5,6 @@ import useBz2DecompressWorker from "@/hooks/useBz2DecompressWorker";
 import { States } from "@/types/decompressWorker";
 import useSearchWorker from "@/hooks/useSearchWorker";
 
-// ANSI 이스케이프 시퀀스를 제거하는 함수
-function stripAnsiCodes(str: string) {
-  // eslint-disable-next-line no-control-regex
-  return str.replace(/\x1B\[[0-9;]*[A-Za-z]/g, "");
-}
-
 const TtyrecPlayer = ({
   file,
   onEnded,
@@ -183,7 +177,7 @@ const TtyrecPlayer = ({
               }}
             >
               <div>{result.relativeTimestamp.time}</div>
-              <div>{stripAnsiCodes(result.textSnippet)}</div>
+              <div>{result.textSnippet}</div>
             </div>
           ))}
         </div>

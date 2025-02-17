@@ -92,7 +92,7 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
           usec: relativeUsec,
           time: relativeTime,
         },
-        textSnippet: payloadStr.slice(0, 100), // 일부 내용만 미리보기
+        textSnippet: strippedPayloadStr.slice(0, 100), // 일부 내용만 미리보기
       });
     }
     frameIndex++;

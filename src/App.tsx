@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import TtyrecPlayer from "./components/TtyrecPlayer";
 import FileUploader from "./components/FileUploader";
@@ -9,7 +9,7 @@ import DrawDCSSCharacters, { ColorMaps } from "./components/Icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
-// import Search from "./components/Search";
+import Search from "./components/Search";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -61,6 +61,8 @@ const App = () => {
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
   const [safeFile, setSafeFile] = useState<File | Blob | null>(null);
   const { result, status, decompressFile } = useBz2DecompressWorker();
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const playerRef = useRef<any>(null);
 
   const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
@@ -136,6 +138,7 @@ const App = () => {
       ) : (
         <div className="flex flex-col items-center xl:grid xl:grid-cols-[1fr_300px] xl:items-start gap-4">
           <TtyrecPlayer
+            ref={playerRef}
             file={safeFile}
             status={status}
             onEnded={playNextFile}
@@ -157,7 +160,9 @@ const App = () => {
                 onFileSelect={(index) => setCurrentFileIndex(index)}
               />
             </TabsContent>
-            <TabsContent value="search">{/* <Search /> */}</TabsContent>
+            <TabsContent value="search">
+              <Search playerRef={playerRef} file={safeFile} />
+            </TabsContent>
           </Tabs>
         </div>
       )}

@@ -12,13 +12,17 @@ const updateState = (state: State) => {
   });
 };
 
-self.onmessage = async (e) => {
+self.onmessage = async (e: MessageEvent<Message>) => {
   try {
     if (e.data.type === "decompress") {
+      if (e.data.data === undefined) {
+        throw new Error("No data provided");
+      }
+
       // 상태 업데이트: 압축 해제 시작
       updateState(States.DECOMPRESSING);
 
-      const fileData = await e.data.file.arrayBuffer();
+      const fileData = await e.data.data.arrayBuffer();
       const decompressed = decompress(new Uint8Array(fileData));
       const blob = new Blob([decompressed], {
         type: "application/octet-stream",

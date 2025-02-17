@@ -7,7 +7,7 @@ export enum States {
 
 export type State = (typeof States)[keyof typeof States];
 
-export type MessageType = "status" | "data" | "error";
+export type MessageType = "decompress" | "status" | "data" | "error";
 
 export type Message = {
   type: MessageType;

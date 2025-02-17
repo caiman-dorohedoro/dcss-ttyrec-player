@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import TtyrecPlayer from "./components/TtyrecPlayer";
 import FileUploader from "./components/FileUploader";
@@ -7,7 +7,9 @@ import { Button } from "./components/ui/button";
 import { RotateCcw } from "lucide-react";
 import DrawDCSSCharacters, { ColorMaps } from "./components/Icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "./components/ui/input";
+import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
+import { States } from "./types/decompressWorker";
+// import Search from "./components/Search";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -57,6 +59,8 @@ const logoChars = [
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
+  const [safeFile, setSafeFile] = useState<File | Blob | null>(null);
+  const { result, status, decompressFile } = useBz2DecompressWorker();
 
   const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
@@ -90,6 +94,27 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    const currentFile = selectedFiles[currentFileIndex];
+
+    if (!currentFile) return;
+
+    const isCompressed = currentFile.name.endsWith(".bz2");
+
+    if (!isCompressed) {
+      setSafeFile(currentFile);
+      return;
+    }
+
+    decompressFile(currentFile);
+  }, [currentFileIndex, selectedFiles, decompressFile]);
+
+  useEffect(() => {
+    if (status === States.COMPLETED) {
+      setSafeFile(result);
+    }
+  }, [status, result]);
+
   return (
     <div className="relative mx-auto xl:py-8 py-4">
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
@@ -111,7 +136,8 @@ const App = () => {
       ) : (
         <div className="flex flex-col items-center xl:grid xl:grid-cols-[1fr_300px] xl:items-start gap-4">
           <TtyrecPlayer
-            file={selectedFiles[currentFileIndex]}
+            file={safeFile}
+            status={status}
             onEnded={playNextFile}
           />
           <Tabs defaultValue="playlist">
@@ -131,14 +157,7 @@ const App = () => {
                 onFileSelect={(index) => setCurrentFileIndex(index)}
               />
             </TabsContent>
-            <TabsContent value="search">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Input placeholder="검색어를 입력하세요" />
-                  <Button>검색</Button>
-                </div>
-              </div>
-            </TabsContent>
+            <TabsContent value="search">{/* <Search /> */}</TabsContent>
           </Tabs>
         </div>
       )}

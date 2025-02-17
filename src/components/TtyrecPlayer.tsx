@@ -1,17 +1,17 @@
 import { useRef, useEffect } from "react";
 import * as AsciinemaPlayer from "asciinema-player";
 import "asciinema-player/dist/bundle/asciinema-player.css";
-import useBz2DecompressWorker from "@/hooks/useBz2DecompressWorker";
 import { States } from "@/types/decompressWorker";
 
 const TtyrecPlayer = ({
   file,
+  status,
   onEnded,
 }: {
-  file: File;
+  file: File | Blob | null;
+  status: States;
   onEnded: () => void;
 }) => {
-  const { result, status, decompressFile } = useBz2DecompressWorker();
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
@@ -26,35 +26,23 @@ const TtyrecPlayer = ({
         playerRef.current = null;
       }
 
-      const isCompressed = file.name.endsWith(".bz2");
+      try {
+        const url = URL.createObjectURL(file);
 
-      if (!isCompressed) {
-        try {
-          const url = URL.createObjectURL(file);
+        playerRef.current = AsciinemaPlayer.create(
+          {
+            url,
+            parser: "ttyrec",
+          },
+          containerRef.current
+        );
 
-          playerRef.current = AsciinemaPlayer.create(
-            {
-              url,
-              parser: "ttyrec",
-            },
-            containerRef.current
-          );
-
-          playerRef.current.addEventListener("ended", onEnded);
-        } catch (error) {
-          console.error("Error decompressing file:", error);
-        }
-
-        return;
+        playerRef.current.addEventListener("ended", onEnded);
+      } catch (error) {
+        console.error("Error decompressing file:", error);
       }
 
-      if (isCompressed) {
-        try {
-          decompressFile(file);
-        } catch (error) {
-          console.error("Error decompressing file:", error);
-        }
-      }
+      return;
     };
 
     initPlayer();
@@ -65,35 +53,7 @@ const TtyrecPlayer = ({
         playerRef.current = null;
       }
     };
-  }, [file, onEnded, decompressFile]);
-
-  useEffect(() => {
-    if (!result) return;
-
-    if (playerRef.current) {
-      playerRef.current.dispose();
-      playerRef.current = null;
-    }
-
-    const url = URL.createObjectURL(result);
-
-    playerRef.current = AsciinemaPlayer.create(
-      {
-        url,
-        parser: "ttyrec",
-      },
-      containerRef.current
-    );
-
-    playerRef.current.addEventListener("ended", onEnded);
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        playerRef.current = null;
-      }
-    };
-  }, [result, onEnded]);
+  }, [file, onEnded]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">

@@ -1,8 +1,11 @@
 import React from "react";
 import { XCircle } from "lucide-react";
+import { States } from "@/types/decompressWorker";
+import { cn } from "@/lib/utils";
 
 interface PlaylistProps {
   className?: string;
+  status: States;
   files: File[];
   currentFileIndex: number;
   onFileRemove: (index: number) => void;
@@ -11,21 +14,28 @@ interface PlaylistProps {
 
 const Playlist: React.FC<PlaylistProps> = ({
   files,
+  status,
   currentFileIndex,
   onFileRemove,
   onFileSelect,
   className,
 }) => {
   return (
-    <div className={className}>
+    <div className={cn("relative", className)}>
       {files.length > 0 ? (
-        <ul className="border rounded-md overflow-hidden">
+        <ul className="border rounded-md overflow-hidden max-h-[546px] overflow-y-auto scrollbar-thin scrollbar-thumb-accent scrollbar-track-transparent">
           {files.map((file, index) => (
             <li
               key={index}
-              className={`xl:max-w-[300px] max-w-[700px] px-4 py-2 border-b last:border-b-0 cursor-pointer hover:bg-gray-100 ${
+              className={`xl:max-w-[300px] max-w-[700px] px-4 py-2 border-b last:border-b-0  hover:bg-gray-100 ${
                 currentFileIndex === index ? "bg-blue-100" : ""
-              } flex items-center justify-between`}
+              } 
+              ${
+                status === States.DECOMPRESSING && currentFileIndex !== index
+                  ? "cursor-not-allowed bg-gray-100"
+                  : "cursor-pointer"
+              }
+              flex items-center justify-between`}
               onClick={() => onFileSelect(index)}
             >
               <span className="truncate">{file.name}</span>

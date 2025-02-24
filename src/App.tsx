@@ -225,6 +225,7 @@ const App = () => {
             <TabsContent value="playlist">
               <Playlist
                 files={selectedFiles}
+                status={status}
                 currentFileIndex={currentFileIndex}
                 onFileRemove={handleFileRemove}
                 onFileSelect={(index) => setCurrentFileIndex(index)}

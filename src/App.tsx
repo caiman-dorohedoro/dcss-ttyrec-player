@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
 import Search from "./components/Search";
+import { formatSize } from "./lib/utils";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -129,7 +130,8 @@ const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
   const [safeFile, setSafeFile] = useState<File | Blob | null>(null);
-  const { result, status, decompressFile } = useBz2DecompressWorker();
+  const { result, status, decompressFile, cacheStats, clearCache } =
+    useBz2DecompressWorker();
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
 
@@ -165,6 +167,12 @@ const App = () => {
     }
   };
 
+  const handleReset = () => {
+    clearCache();
+    setSelectedFiles([]);
+    setCurrentFileIndex(0);
+  };
+
   useEffect(() => {
     const currentFile = selectedFiles[currentFileIndex];
 
@@ -188,6 +196,12 @@ const App = () => {
 
   return (
     <div className="relative mx-auto xl:py-8 py-4">
+      {cacheStats && (
+        <div className="text-xs text-gray-500 mb-2 text-right">
+          캐시: {formatSize(cacheStats.currentSize)} /{" "}
+          {formatSize(cacheStats.maxSize)}
+        </div>
+      )}
       <div className="mx-auto relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
           <DrawDCSSCharacters chars={logoChars} />
@@ -196,7 +210,7 @@ const App = () => {
         {selectedFiles.length > 0 && (
           <Button
             size="sm"
-            onClick={() => setSelectedFiles([])}
+            onClick={handleReset}
             className="absolute -right-[95px] cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" /> 초기화{/* Reset */}

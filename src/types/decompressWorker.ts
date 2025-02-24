@@ -7,11 +7,19 @@ export enum States {
 
 export type State = (typeof States)[keyof typeof States];
 
+export type CacheStats = {
+  size: number;
+  maxSize: number;
+  currentSize: number;
+};
+
 export enum MessageType {
   DECOMPRESS = "decompress",
   STATUS = "status",
   DATA = "data",
   ERROR = "error",
+  CACHE_STATS = "cache_stats",
+  CLEAR_CACHE = "clear_cache",
 }
 
 export type DecompressMessage = {
@@ -30,6 +38,15 @@ export type StatusMessage = {
   status: State;
 };
 
+export type CacheStatsMessage = {
+  type: MessageType.CACHE_STATS;
+  stats: CacheStats;
+};
+
+export type ClearCacheMessage = {
+  type: MessageType.CLEAR_CACHE;
+};
+
 export type ErrorMessage = {
   type: MessageType.ERROR;
   error: string;
@@ -39,4 +56,6 @@ export type Message =
   | DecompressMessage
   | StatusMessage
   | ErrorMessage
-  | DecompressResultMessage;
+  | DecompressResultMessage
+  | CacheStatsMessage
+  | ClearCacheMessage;

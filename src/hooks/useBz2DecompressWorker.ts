@@ -1,4 +1,10 @@
-import { Message, MessageType, State, States } from "@/types/decompressWorker";
+import {
+  CacheStats,
+  Message,
+  MessageType,
+  State,
+  States,
+} from "@/types/decompressWorker";
 import { useState, useCallback, useEffect } from "react";
 import DecompressWorker from "@/workers/decompressWorker?worker";
 
@@ -10,6 +16,7 @@ const useBz2DecompressWorker = () => {
   const [status, setStatus] = useState<State>(States.INIT);
   const [result, setResult] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
   const [worker, setWorker] = useState<Worker | null>(null);
 
   useEffect(() => {
@@ -34,9 +41,17 @@ const useBz2DecompressWorker = () => {
 
         return;
       }
+
+      if (e.data.type === MessageType.CACHE_STATS) {
+        setCacheStats(e.data.stats);
+        return;
+      }
     };
 
     setWorker(w);
+
+    // 초기 캐시 상태 요청
+    w.postMessage({ type: MessageType.CACHE_STATS });
 
     // cleanup
     return () => w.terminate();
@@ -61,11 +76,19 @@ const useBz2DecompressWorker = () => {
     [worker]
   );
 
+  const clearCache = useCallback(() => {
+    if (!worker) return;
+
+    postMessage(worker, { type: MessageType.CLEAR_CACHE });
+  }, [worker]);
+
   return {
     status,
     result,
     error,
+    cacheStats,
     decompressFile,
+    clearCache,
   };
 };
 

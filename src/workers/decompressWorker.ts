@@ -2,6 +2,17 @@ import { LRUCache } from "lru-cache";
 import decompress from "../lib/bz2";
 import { State, States, Message, MessageType } from "../types/decompressWorker";
 
+const sendCacheStats = () => {
+  postMessage({
+    type: MessageType.CACHE_STATS,
+    stats: {
+      size: cache.size,
+      maxSize: cache.maxSize,
+      currentSize: cache.calculatedSize || 0,
+    },
+  });
+};
+
 const cache = new LRUCache({
   max: 50, // 최대 50개 항목
   maxSize: 400 * 1024 * 1024, // 최대 100MB
@@ -9,17 +20,27 @@ const cache = new LRUCache({
     return value.size; // Blob의 크기를 기준으로
   },
   ttl: 1000 * 60 * 30,
+  dispose: () => {
+    // 캐시 항목이 제거될 때 상태 업데이트
+    sendCacheStats();
+  },
 });
-
-const postMessage = (message: Message) => {
-  self.postMessage(message);
-};
 
 const updateState = (state: State) => {
   postMessage({
     type: MessageType.STATUS,
     status: state,
   });
+};
+
+// 캐시 조작하는 함수들을 래핑하여 상태 변경 추적
+const setCacheItem = (key: string, value: Blob) => {
+  cache.set(key, value);
+  sendCacheStats(); // 캐시 설정 후 상태 전송
+};
+
+const postMessage = (message: Message) => {
+  self.postMessage(message);
 };
 
 self.onmessage = async (e: MessageEvent<Message>) => {
@@ -52,7 +73,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
       });
 
       // LRU 캐시에 저장
-      cache.set(fileName, blob);
+      setCacheItem(fileName, blob);
 
       postMessage({
         type: MessageType.DATA,
@@ -60,6 +81,11 @@ self.onmessage = async (e: MessageEvent<Message>) => {
       });
 
       updateState(States.COMPLETED);
+    } else if (e.data.type === MessageType.CACHE_STATS) {
+      sendCacheStats();
+    } else if (e.data.type === MessageType.CLEAR_CACHE) {
+      cache.clear();
+      sendCacheStats();
     }
   } catch (error) {
     updateState(States.ERROR);

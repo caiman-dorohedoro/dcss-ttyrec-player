@@ -18,7 +18,7 @@ const postMessage = (message: WorkerOutgoingMessage) => {
 
 const cache = new LRUCache({
   max: 50, // 최대 50개 항목
-  maxSize: 4 * 1024 * 1024, // 최대 100MB
+  maxSize: 400 * 1024 * 1024, // 최대 400MB
   sizeCalculation: (value: Blob) => {
     return value.size; // Blob의 크기를 기준으로
   },

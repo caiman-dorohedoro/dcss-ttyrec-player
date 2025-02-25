@@ -22,6 +22,14 @@ const Playlist: React.FC<PlaylistProps> = ({
   onFileSelect,
   className,
 }) => {
+  const isDecompressedFile = (fileName: string) => {
+    return fileName.endsWith(".ttyrec");
+  };
+
+  const isDecompressedResultCachedFile = (fileName: string) => {
+    return fileName.endsWith(".bz2") && cachedFileNames.includes(fileName);
+  };
+
   return (
     <div className={cn("relative", className)}>
       {files.length > 0 ? (
@@ -32,8 +40,10 @@ const Playlist: React.FC<PlaylistProps> = ({
               className={`xl:max-w-[300px] max-w-[700px] px-4 py-2 border-b last:border-b-0  hover:bg-gray-100 ${
                 currentFileIndex === index ? "bg-blue-100" : ""
               } ${
-                cachedFileNames.includes(file.name) &&
-                "bg-green-50 border-l-4 border-l-green-500"
+                isDecompressedFile(file.name) ||
+                isDecompressedResultCachedFile(file.name)
+                  ? "bg-green-50 border-l-4 border-l-green-500"
+                  : ""
               }
               ${
                 status === States.DECOMPRESSING && currentFileIndex !== index

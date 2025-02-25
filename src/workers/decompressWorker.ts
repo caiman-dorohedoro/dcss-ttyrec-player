@@ -14,19 +14,6 @@ const postMessage = (message: WorkerOutgoingMessage) => {
   self.postMessage(message);
 };
 
-const sendCacheStats = () => {
-  const cacheStats: CacheStats = {
-    size: cache.size,
-    maxSize: cache.maxSize,
-    currentSize: cache.calculatedSize || 0,
-  };
-
-  postMessage({
-    type: WorkerOutgoingMessageType.CACHE_STATS_RESULT,
-    stats: cacheStats,
-  });
-};
-
 const cache = new LRUCache({
   max: 50, // 최대 50개 항목
   maxSize: 400 * 1024 * 1024, // 최대 100MB
@@ -39,6 +26,19 @@ const cache = new LRUCache({
     sendCacheStats();
   },
 });
+
+const sendCacheStats = () => {
+  const cacheStats: CacheStats = {
+    size: cache.size,
+    maxSize: cache.maxSize,
+    currentSize: cache.calculatedSize || 0,
+  };
+
+  postMessage({
+    type: WorkerOutgoingMessageType.CACHE_STATS_RESULT,
+    stats: cacheStats,
+  });
+};
 
 const updateState = (state: State) => {
   postMessage({

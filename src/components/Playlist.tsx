@@ -1,5 +1,5 @@
 import React from "react";
-import { XCircle } from "lucide-react";
+import { Package, PackageOpen, XCircle } from "lucide-react";
 import { States } from "@/types/decompressWorker";
 import { cn } from "@/lib/utils";
 
@@ -22,12 +22,12 @@ const Playlist: React.FC<PlaylistProps> = ({
   onFileSelect,
   className,
 }) => {
-  const isDecompressedFile = (fileName: string) => {
-    return fileName.endsWith(".ttyrec");
+  const isCompressedFile = (fileName: string) => {
+    return fileName.endsWith(".bz2");
   };
 
   const isDecompressedResultCachedFile = (fileName: string) => {
-    return fileName.endsWith(".bz2") && cachedFileNames.includes(fileName);
+    return isCompressedFile(fileName) && cachedFileNames.includes(fileName);
   };
 
   return (
@@ -37,14 +37,9 @@ const Playlist: React.FC<PlaylistProps> = ({
           {files.map((file, index) => (
             <li
               key={index}
-              className={`xl:max-w-[300px] max-w-[700px] px-4 py-2 border-b last:border-b-0  hover:bg-gray-100 ${
+              className={`xl:max-w-[300px] max-w-[700px] px-2 py-2 gap-x-0.5 border-b last:border-b-0  hover:bg-gray-100 ${
                 currentFileIndex === index ? "bg-blue-100" : ""
-              } ${
-                isDecompressedFile(file.name) ||
-                isDecompressedResultCachedFile(file.name)
-                  ? "bg-green-50 border-l-4 border-l-green-500"
-                  : ""
-              }
+              } 
               ${
                 status === States.DECOMPRESSING && currentFileIndex !== index
                   ? "cursor-not-allowed bg-gray-100"
@@ -53,6 +48,9 @@ const Playlist: React.FC<PlaylistProps> = ({
               flex items-center justify-between`}
               onClick={() => onFileSelect(index)}
             >
+              {isCompressedFile(file.name) &&
+                !isDecompressedResultCachedFile(file.name) && <Package />}
+              {isDecompressedResultCachedFile(file.name) && <PackageOpen />}
               <span className="truncate">{file.name}</span>
               <button
                 onClick={(e) => {

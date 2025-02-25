@@ -1,21 +1,30 @@
 import { LRUCache } from "lru-cache";
 import decompress from "../lib/bz2";
-import { State, States, Message, MessageType } from "../types/decompressWorker";
+import {
+  State,
+  States,
+  WorkerOutgoingMessageType,
+  WorkerIncomingMessage,
+  WorkerIncomingMessageType,
+  CacheStats,
+} from "../types/decompressWorker";
 
 const sendCacheStats = () => {
+  const cacheStats: CacheStats = {
+    size: cache.size,
+    maxSize: cache.maxSize,
+    currentSize: cache.calculatedSize || 0,
+  };
+
   self.postMessage({
-    type: MessageType.CACHE_STATS,
-    stats: {
-      size: cache.size,
-      maxSize: cache.maxSize,
-      currentSize: cache.calculatedSize || 0,
-    },
+    type: WorkerOutgoingMessageType.CACHE_STATS_RESULT,
+    stats: cacheStats,
   });
 };
 
 const cache = new LRUCache({
   max: 50, // 최대 50개 항목
-  maxSize: 400 * 1024 * 1024, // 최대 100MB
+  maxSize: 4 * 1024 * 1024, // 최대 100MB
   sizeCalculation: (value: Blob) => {
     return value.size; // Blob의 크기를 기준으로
   },
@@ -28,7 +37,7 @@ const cache = new LRUCache({
 
 const updateState = (state: State) => {
   self.postMessage({
-    type: MessageType.STATUS,
+    type: WorkerOutgoingMessageType.STATUS,
     status: state,
   });
 };
@@ -39,9 +48,9 @@ const setCacheItem = (key: string, value: Blob) => {
   sendCacheStats(); // 캐시 설정 후 상태 전송
 };
 
-self.onmessage = async (e: MessageEvent<Message>) => {
+self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
   try {
-    if (e.data.type === MessageType.DECOMPRESS) {
+    if (e.data.type === WorkerIncomingMessageType.DECOMPRESS) {
       if (e.data.data === undefined) {
         throw new Error("No data provided");
       }
@@ -53,7 +62,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
 
       if (cachedData) {
         self.postMessage({
-          type: MessageType.DATA,
+          type: WorkerOutgoingMessageType.DATA,
           data: cachedData,
         });
         updateState(States.COMPLETED);
@@ -72,21 +81,21 @@ self.onmessage = async (e: MessageEvent<Message>) => {
       setCacheItem(fileName, blob);
 
       self.postMessage({
-        type: MessageType.DATA,
+        type: WorkerOutgoingMessageType.DATA,
         data: blob,
       });
 
       updateState(States.COMPLETED);
-    } else if (e.data.type === MessageType.CACHE_STATS) {
+    } else if (e.data.type === WorkerIncomingMessageType.CACHE_STATS) {
       sendCacheStats();
-    } else if (e.data.type === MessageType.CLEAR_CACHE) {
+    } else if (e.data.type === WorkerIncomingMessageType.CLEAR_CACHE) {
       cache.clear();
       sendCacheStats();
     }
   } catch (error) {
     updateState(States.ERROR);
     self.postMessage({
-      type: MessageType.ERROR,
+      type: WorkerOutgoingMessageType.ERROR,
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

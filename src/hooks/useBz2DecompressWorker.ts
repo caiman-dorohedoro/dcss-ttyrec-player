@@ -1,14 +1,16 @@
 import {
   CacheStats,
-  Message,
-  MessageType,
+  WorkerOutgoingMessage,
+  WorkerOutgoingMessageType,
   State,
   States,
+  WorkerIncomingMessageType,
+  WorkerIncomingMessage,
 } from "@/types/decompressWorker";
 import { useState, useCallback, useEffect } from "react";
 import DecompressWorker from "@/workers/decompressWorker?worker";
 
-const postMessage = (worker: Worker, message: Message) => {
+const postMessage = (worker: Worker, message: WorkerIncomingMessage) => {
   worker.postMessage(message);
 };
 
@@ -22,27 +24,27 @@ const useBz2DecompressWorker = () => {
   useEffect(() => {
     const w = new DecompressWorker();
 
-    w.onmessage = (e: MessageEvent<Message>) => {
-      if (e.data.type === MessageType.STATUS) {
+    w.onmessage = (e: MessageEvent<WorkerOutgoingMessage>) => {
+      if (e.data.type === WorkerOutgoingMessageType.STATUS) {
         setStatus(e.data.status);
 
         return;
       }
 
-      if (e.data.type === MessageType.DATA) {
+      if (e.data.type === WorkerOutgoingMessageType.DATA) {
         setResult(e.data.data || null);
 
         return;
       }
 
-      if (e.data.type === MessageType.ERROR) {
+      if (e.data.type === WorkerOutgoingMessageType.ERROR) {
         setStatus(States.ERROR);
         setError(e.data.error || null);
 
         return;
       }
 
-      if (e.data.type === MessageType.CACHE_STATS) {
+      if (e.data.type === WorkerOutgoingMessageType.CACHE_STATS_RESULT) {
         setCacheStats(e.data.stats);
         return;
       }
@@ -51,7 +53,7 @@ const useBz2DecompressWorker = () => {
     setWorker(w);
 
     // 초기 캐시 상태 요청
-    w.postMessage({ type: MessageType.CACHE_STATS });
+    w.postMessage({ type: WorkerOutgoingMessageType.CACHE_STATS_RESULT });
 
     // cleanup
     return () => w.terminate();
@@ -65,7 +67,7 @@ const useBz2DecompressWorker = () => {
         setError(null);
 
         postMessage(worker, {
-          type: MessageType.DECOMPRESS,
+          type: WorkerIncomingMessageType.DECOMPRESS,
           name: file.name,
           data: file,
         });
@@ -79,7 +81,7 @@ const useBz2DecompressWorker = () => {
   const clearCache = useCallback(() => {
     if (!worker) return;
 
-    postMessage(worker, { type: MessageType.CLEAR_CACHE });
+    postMessage(worker, { type: WorkerIncomingMessageType.CLEAR_CACHE });
   }, [worker]);
 
   return {

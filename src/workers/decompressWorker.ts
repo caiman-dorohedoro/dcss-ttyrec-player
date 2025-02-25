@@ -73,7 +73,9 @@ const decompressFile = async (file: File) => {
   return blob;
 };
 
-const handleDecompress = async (e: MessageEvent<DecompressMessage>) => {
+const handleIncomingDecompressRequest = async (
+  e: MessageEvent<DecompressMessage>
+) => {
   if (e.data.data === undefined) {
     throw new Error("No data provided");
   }
@@ -106,7 +108,7 @@ const handleDecompress = async (e: MessageEvent<DecompressMessage>) => {
 self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
   try {
     if (isDecompressMessage(e)) {
-      handleDecompress(e);
+      handleIncomingDecompressRequest(e);
     } else if (e.data.type === WorkerIncomingMessageType.CACHE_STATS) {
       sendCacheStats();
     } else if (e.data.type === WorkerIncomingMessageType.CLEAR_CACHE) {

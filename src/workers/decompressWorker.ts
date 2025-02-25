@@ -53,6 +53,14 @@ const setCacheItem = (key: string, value: Blob) => {
   sendCacheStats(); // 캐시 설정 후 상태 전송
 };
 
+const sendCachedData = (cachedData: Blob) => {
+  postMessage({
+    type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
+    data: cachedData,
+  });
+  updateState(States.COMPLETED);
+};
+
 self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
   try {
     if (e.data.type === WorkerIncomingMessageType.DECOMPRESS) {
@@ -66,11 +74,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
       const cachedData = cache.get(fileName);
 
       if (cachedData) {
-        postMessage({
-          type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
-          data: cachedData,
-        });
-        updateState(States.COMPLETED);
+        sendCachedData(cachedData);
         return;
       }
 

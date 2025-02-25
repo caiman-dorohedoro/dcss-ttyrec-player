@@ -68,7 +68,10 @@ const updateState = (state: State) => {
 const setCacheItem = (key: string, value: Blob) => {
   cache.set(key, value);
   sendCacheStats(); // 캐시 설정 후 상태 전송
-  sendCachedFileName(key);
+
+  if (cache.get(key)) {
+    sendCachedFileName(key);
+  }
 };
 
 const sendCachedData = (cachedData: Blob) => {

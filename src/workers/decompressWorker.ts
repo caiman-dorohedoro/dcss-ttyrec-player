@@ -61,6 +61,16 @@ const sendCachedData = (cachedData: Blob) => {
   updateState(States.COMPLETED);
 };
 
+const decompressFile = async (file: File) => {
+  const fileData = await file.arrayBuffer();
+  const decompressed = decompress(new Uint8Array(fileData));
+  const blob = new Blob([decompressed], {
+    type: "application/octet-stream",
+  });
+
+  return blob;
+};
+
 self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
   try {
     if (e.data.type === WorkerIncomingMessageType.DECOMPRESS) {
@@ -80,11 +90,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
 
       updateState(States.DECOMPRESSING);
 
-      const fileData = await e.data.data.arrayBuffer();
-      const decompressed = decompress(new Uint8Array(fileData));
-      const blob = new Blob([decompressed], {
-        type: "application/octet-stream",
-      });
+      const blob = await decompressFile(e.data.data);
 
       // LRU 캐시에 저장
       setCacheItem(fileName, blob);

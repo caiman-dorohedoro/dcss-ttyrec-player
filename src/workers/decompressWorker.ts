@@ -7,7 +7,12 @@ import {
   WorkerIncomingMessage,
   WorkerIncomingMessageType,
   CacheStats,
+  WorkerOutgoingMessage,
 } from "../types/decompressWorker";
+
+const postMessage = (message: WorkerOutgoingMessage) => {
+  self.postMessage(message);
+};
 
 const sendCacheStats = () => {
   const cacheStats: CacheStats = {
@@ -16,7 +21,7 @@ const sendCacheStats = () => {
     currentSize: cache.calculatedSize || 0,
   };
 
-  self.postMessage({
+  postMessage({
     type: WorkerOutgoingMessageType.CACHE_STATS_RESULT,
     stats: cacheStats,
   });
@@ -36,7 +41,7 @@ const cache = new LRUCache({
 });
 
 const updateState = (state: State) => {
-  self.postMessage({
+  postMessage({
     type: WorkerOutgoingMessageType.STATUS,
     status: state,
   });
@@ -61,7 +66,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
       const cachedData = cache.get(fileName);
 
       if (cachedData) {
-        self.postMessage({
+        postMessage({
           type: WorkerOutgoingMessageType.DATA,
           data: cachedData,
         });
@@ -80,7 +85,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
       // LRU 캐시에 저장
       setCacheItem(fileName, blob);
 
-      self.postMessage({
+      postMessage({
         type: WorkerOutgoingMessageType.DATA,
         data: blob,
       });
@@ -94,7 +99,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
     }
   } catch (error) {
     updateState(States.ERROR);
-    self.postMessage({
+    postMessage({
       type: WorkerOutgoingMessageType.ERROR,
       error: error instanceof Error ? error.message : "Unknown error",
     });

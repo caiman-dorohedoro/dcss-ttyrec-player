@@ -78,7 +78,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
         throw new Error("No data provided");
       }
 
-      const fileName = e.data.name || "default";
+      const fileName = e.data.name;
 
       // 캐시에서 확인
       const cachedData = cache.get(fileName);

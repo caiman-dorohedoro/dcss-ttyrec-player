@@ -71,3 +71,10 @@ export type WorkerIncomingMessage =
   | DecompressMessage
   | CacheStatsMessage
   | ClearCacheMessage;
+
+// 타입 가드
+export const isDecompressMessage = (
+  e: MessageEvent<WorkerIncomingMessage>
+): e is MessageEvent<DecompressMessage> => {
+  return e.data.type === WorkerIncomingMessageType.DECOMPRESS;
+};

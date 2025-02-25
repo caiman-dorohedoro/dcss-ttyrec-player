@@ -3,7 +3,7 @@ import decompress from "../lib/bz2";
 import { State, States, Message, MessageType } from "../types/decompressWorker";
 
 const sendCacheStats = () => {
-  postMessage({
+  self.postMessage({
     type: MessageType.CACHE_STATS,
     stats: {
       size: cache.size,
@@ -27,7 +27,7 @@ const cache = new LRUCache({
 });
 
 const updateState = (state: State) => {
-  postMessage({
+  self.postMessage({
     type: MessageType.STATUS,
     status: state,
   });
@@ -37,10 +37,6 @@ const updateState = (state: State) => {
 const setCacheItem = (key: string, value: Blob) => {
   cache.set(key, value);
   sendCacheStats(); // 캐시 설정 후 상태 전송
-};
-
-const postMessage = (message: Message) => {
-  self.postMessage(message);
 };
 
 self.onmessage = async (e: MessageEvent<Message>) => {
@@ -56,7 +52,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
       const cachedData = cache.get(fileName);
 
       if (cachedData) {
-        postMessage({
+        self.postMessage({
           type: MessageType.DATA,
           data: cachedData,
         });
@@ -75,7 +71,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
       // LRU 캐시에 저장
       setCacheItem(fileName, blob);
 
-      postMessage({
+      self.postMessage({
         type: MessageType.DATA,
         data: blob,
       });
@@ -89,7 +85,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
     }
   } catch (error) {
     updateState(States.ERROR);
-    postMessage({
+    self.postMessage({
       type: MessageType.ERROR,
       error: error instanceof Error ? error.message : "Unknown error",
     });

@@ -41,7 +41,7 @@ const setCacheItem = (key: string, value: Blob) => {
 
 self.onmessage = async (e: MessageEvent<Message>) => {
   try {
-    if (e.data.type === "decompress") {
+    if (e.data.type === MessageType.DECOMPRESS) {
       if (e.data.data === undefined) {
         throw new Error("No data provided");
       }

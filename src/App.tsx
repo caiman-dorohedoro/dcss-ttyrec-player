@@ -204,7 +204,7 @@ const App = () => {
     <div className="relative mx-auto xl:py-8 py-4">
       {cacheStats && (
         <div className="text-xs text-gray-500 mb-2 text-right">
-          캐시: {formatSize(cacheStats.currentSize)} /{" "}
+          압축 해제 캐시: {formatSize(cacheStats.currentSize)} /{" "}
           {formatSize(cacheStats.maxSize)}
         </div>
       )}

@@ -31,7 +31,7 @@ const useBz2DecompressWorker = () => {
         return;
       }
 
-      if (e.data.type === WorkerOutgoingMessageType.DATA) {
+      if (e.data.type === WorkerOutgoingMessageType.DECOMPRESS_RESULT) {
         setResult(e.data.data || null);
 
         return;

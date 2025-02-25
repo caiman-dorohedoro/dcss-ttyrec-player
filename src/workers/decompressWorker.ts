@@ -67,7 +67,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
 
       if (cachedData) {
         postMessage({
-          type: WorkerOutgoingMessageType.DATA,
+          type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
           data: cachedData,
         });
         updateState(States.COMPLETED);
@@ -86,7 +86,7 @@ self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
       setCacheItem(fileName, blob);
 
       postMessage({
-        type: WorkerOutgoingMessageType.DATA,
+        type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
         data: blob,
       });
 

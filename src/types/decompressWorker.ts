@@ -15,7 +15,7 @@ export type CacheStats = {
 
 export enum WorkerOutgoingMessageType {
   STATUS = "status",
-  DATA = "data",
+  DECOMPRESS_RESULT = "decompress_result",
   ERROR = "error",
   CACHE_STATS_RESULT = "cache_stats_result",
 }
@@ -33,7 +33,7 @@ export type DecompressMessage = {
 };
 
 export type DecompressResultMessage = {
-  type: WorkerOutgoingMessageType.DATA;
+  type: WorkerOutgoingMessageType.DECOMPRESS_RESULT;
   data: Blob;
 };
 

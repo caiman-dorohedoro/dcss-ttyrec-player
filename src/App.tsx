@@ -130,8 +130,14 @@ const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
   const [safeFile, setSafeFile] = useState<File | Blob | null>(null);
-  const { result, status, decompressFile, cacheStats, clearCache } =
-    useBz2DecompressWorker();
+  const {
+    result,
+    status,
+    decompressFile,
+    cacheStats,
+    clearCache,
+    cachedFileNames,
+  } = useBz2DecompressWorker();
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
 
@@ -239,6 +245,7 @@ const App = () => {
             <TabsContent value="playlist">
               <Playlist
                 files={selectedFiles}
+                cachedFileNames={cachedFileNames}
                 status={status}
                 currentFileIndex={currentFileIndex}
                 onFileRemove={handleFileRemove}

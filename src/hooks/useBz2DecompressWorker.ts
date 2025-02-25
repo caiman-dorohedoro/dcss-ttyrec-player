@@ -20,6 +20,7 @@ const useBz2DecompressWorker = () => {
   const [error, setError] = useState<string | null>(null);
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
   const [worker, setWorker] = useState<Worker | null>(null);
+  const [cachedFileNames, setCachedFileNames] = useState<string[]>([]);
 
   useEffect(() => {
     const w = new DecompressWorker();
@@ -46,6 +47,32 @@ const useBz2DecompressWorker = () => {
 
       if (e.data.type === WorkerOutgoingMessageType.CACHE_STATS_RESULT) {
         setCacheStats(e.data.stats);
+        return;
+      }
+
+      if (e.data.type === WorkerOutgoingMessageType.CACHED_FILENAME) {
+        setCachedFileNames((prev) => {
+          if (e.data.type !== WorkerOutgoingMessageType.CACHED_FILENAME) {
+            return prev;
+          }
+
+          return [...prev, e.data.fileName];
+        });
+        return;
+      }
+
+      if (e.data.type === WorkerOutgoingMessageType.CACHE_DISPOSED_FILENAME) {
+        setCachedFileNames((prev) =>
+          prev.filter((fileName) => {
+            if (
+              e.data.type !== WorkerOutgoingMessageType.CACHE_DISPOSED_FILENAME
+            ) {
+              return true;
+            }
+
+            return fileName !== e.data.fileName;
+          })
+        );
         return;
       }
     };
@@ -91,6 +118,7 @@ const useBz2DecompressWorker = () => {
     cacheStats,
     decompressFile,
     clearCache,
+    cachedFileNames,
   };
 };
 

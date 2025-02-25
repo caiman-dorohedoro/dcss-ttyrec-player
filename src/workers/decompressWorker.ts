@@ -18,14 +18,15 @@ const postMessage = (message: WorkerOutgoingMessage) => {
 
 const cache = new LRUCache({
   max: 50, // 최대 50개 항목
-  maxSize: 400 * 1024 * 1024, // 최대 100MB
+  maxSize: 4 * 1024 * 1024, // 최대 100MB
   sizeCalculation: (value: Blob) => {
     return value.size; // Blob의 크기를 기준으로
   },
   ttl: 1000 * 60 * 30,
-  dispose: () => {
+  dispose: (_: Blob, key: string) => {
     // 캐시 항목이 제거될 때 상태 업데이트
     sendCacheStats();
+    sendCacheDisposedFileName(key);
   },
 });
 
@@ -42,6 +43,20 @@ const sendCacheStats = () => {
   });
 };
 
+const sendCacheDisposedFileName = (fileName: string) => {
+  postMessage({
+    type: WorkerOutgoingMessageType.CACHE_DISPOSED_FILENAME,
+    fileName,
+  });
+};
+
+const sendCachedFileName = (fileName: string) => {
+  postMessage({
+    type: WorkerOutgoingMessageType.CACHED_FILENAME,
+    fileName,
+  });
+};
+
 const updateState = (state: State) => {
   postMessage({
     type: WorkerOutgoingMessageType.STATUS,
@@ -53,6 +68,7 @@ const updateState = (state: State) => {
 const setCacheItem = (key: string, value: Blob) => {
   cache.set(key, value);
   sendCacheStats(); // 캐시 설정 후 상태 전송
+  sendCachedFileName(key);
 };
 
 const sendCachedData = (cachedData: Blob) => {

@@ -18,6 +18,8 @@ export enum WorkerOutgoingMessageType {
   DECOMPRESS_RESULT = "decompress_result",
   ERROR = "error",
   CACHE_STATS_RESULT = "cache_stats_result",
+  CACHED_FILENAME = "cached_filename",
+  CACHE_DISPOSED_FILENAME = "cache_disposed_filename",
 }
 
 export enum WorkerIncomingMessageType {
@@ -52,6 +54,16 @@ export type CacheStatsResultMessage = {
   stats: CacheStats;
 };
 
+export type CacheDisposedMessage = {
+  type: WorkerOutgoingMessageType.CACHE_DISPOSED_FILENAME;
+  fileName: string;
+};
+
+export type CacheCachedFileNameMessage = {
+  type: WorkerOutgoingMessageType.CACHED_FILENAME;
+  fileName: string;
+};
+
 export type ClearCacheMessage = {
   type: WorkerIncomingMessageType.CLEAR_CACHE;
 };
@@ -65,7 +77,9 @@ export type WorkerOutgoingMessage =
   | DecompressResultMessage
   | StatusMessage
   | ErrorMessage
-  | CacheStatsResultMessage;
+  | CacheStatsResultMessage
+  | CacheDisposedMessage
+  | CacheCachedFileNameMessage;
 
 export type WorkerIncomingMessage =
   | DecompressMessage

@@ -7,6 +7,7 @@ interface PlaylistProps {
   className?: string;
   status: States;
   files: File[];
+  cachedFileNames: string[];
   currentFileIndex: number;
   onFileRemove: (index: number) => void;
   onFileSelect: (index: number) => void;
@@ -14,6 +15,7 @@ interface PlaylistProps {
 
 const Playlist: React.FC<PlaylistProps> = ({
   files,
+  cachedFileNames,
   status,
   currentFileIndex,
   onFileRemove,
@@ -29,7 +31,10 @@ const Playlist: React.FC<PlaylistProps> = ({
               key={index}
               className={`xl:max-w-[300px] max-w-[700px] px-4 py-2 border-b last:border-b-0  hover:bg-gray-100 ${
                 currentFileIndex === index ? "bg-blue-100" : ""
-              } 
+              } ${
+                cachedFileNames.includes(file.name) &&
+                "bg-green-50 border-l-4 border-l-green-500"
+              }
               ${
                 status === States.DECOMPRESSING && currentFileIndex !== index
                   ? "cursor-not-allowed bg-gray-100"

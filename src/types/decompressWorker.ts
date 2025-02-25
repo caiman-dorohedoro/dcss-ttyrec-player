@@ -13,49 +13,61 @@ export type CacheStats = {
   currentSize: number;
 };
 
-export enum MessageType {
-  DECOMPRESS = "decompress",
+export enum WorkerOutgoingMessageType {
   STATUS = "status",
   DATA = "data",
   ERROR = "error",
+  CACHE_STATS_RESULT = "cache_stats_result",
+}
+
+export enum WorkerIncomingMessageType {
+  DECOMPRESS = "decompress",
   CACHE_STATS = "cache_stats",
   CLEAR_CACHE = "clear_cache",
 }
 
 export type DecompressMessage = {
-  type: MessageType.DECOMPRESS;
+  type: WorkerIncomingMessageType.DECOMPRESS;
   name: string;
   data: File;
 };
 
 export type DecompressResultMessage = {
-  type: MessageType.DATA;
+  type: WorkerOutgoingMessageType.DATA;
   data: Blob;
 };
 
 export type StatusMessage = {
-  type: MessageType.STATUS;
+  type: WorkerOutgoingMessageType.STATUS;
   status: State;
 };
 
 export type CacheStatsMessage = {
-  type: MessageType.CACHE_STATS;
+  type: WorkerIncomingMessageType.CACHE_STATS;
+  stats: CacheStats;
+};
+
+export type CacheStatsResultMessage = {
+  type: WorkerOutgoingMessageType.CACHE_STATS_RESULT;
   stats: CacheStats;
 };
 
 export type ClearCacheMessage = {
-  type: MessageType.CLEAR_CACHE;
+  type: WorkerIncomingMessageType.CLEAR_CACHE;
 };
 
 export type ErrorMessage = {
-  type: MessageType.ERROR;
+  type: WorkerOutgoingMessageType.ERROR;
   error: string;
 };
 
-export type Message =
-  | DecompressMessage
+export type WorkerOutgoingMessage =
+  | DecompressResultMessage
   | StatusMessage
   | ErrorMessage
-  | DecompressResultMessage
+  | CacheStatsResultMessage;
+
+export type WorkerIncomingMessage =
+  | DecompressMessage
   | CacheStatsMessage
   | ClearCacheMessage;

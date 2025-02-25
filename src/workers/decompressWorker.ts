@@ -8,6 +8,8 @@ import {
   WorkerIncomingMessageType,
   CacheStats,
   WorkerOutgoingMessage,
+  DecompressMessage,
+  isDecompressMessage,
 } from "../types/decompressWorker";
 
 const postMessage = (message: WorkerOutgoingMessage) => {
@@ -71,36 +73,40 @@ const decompressFile = async (file: File) => {
   return blob;
 };
 
+const handleDecompress = async (e: MessageEvent<DecompressMessage>) => {
+  if (e.data.data === undefined) {
+    throw new Error("No data provided");
+  }
+
+  const fileName = e.data.name;
+
+  // 캐시에서 확인
+  const cachedData = cache.get(fileName);
+
+  if (cachedData) {
+    sendCachedData(cachedData);
+    return;
+  }
+
+  updateState(States.DECOMPRESSING);
+
+  const blob = await decompressFile(e.data.data);
+
+  // LRU 캐시에 저장
+  setCacheItem(fileName, blob);
+
+  postMessage({
+    type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
+    data: blob,
+  });
+
+  updateState(States.COMPLETED);
+};
+
 self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
   try {
-    if (e.data.type === WorkerIncomingMessageType.DECOMPRESS) {
-      if (e.data.data === undefined) {
-        throw new Error("No data provided");
-      }
-
-      const fileName = e.data.name;
-
-      // 캐시에서 확인
-      const cachedData = cache.get(fileName);
-
-      if (cachedData) {
-        sendCachedData(cachedData);
-        return;
-      }
-
-      updateState(States.DECOMPRESSING);
-
-      const blob = await decompressFile(e.data.data);
-
-      // LRU 캐시에 저장
-      setCacheItem(fileName, blob);
-
-      postMessage({
-        type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
-        data: blob,
-      });
-
-      updateState(States.COMPLETED);
+    if (isDecompressMessage(e)) {
+      handleDecompress(e);
     } else if (e.data.type === WorkerIncomingMessageType.CACHE_STATS) {
       sendCacheStats();
     } else if (e.data.type === WorkerIncomingMessageType.CLEAR_CACHE) {

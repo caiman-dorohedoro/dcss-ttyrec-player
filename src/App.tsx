@@ -277,6 +277,18 @@ const App = () => {
           </div>
         </div>
       )}
+
+      {/* Footer with GitHub link */}
+      <div className="fixed bottom-4 right-4 text-xs text-gray-400 lg:right-[calc((100vw-500px)/2)] xl:right-[calc((100vw-896px)/2)]">
+        <a
+          href="https://github.com/caiman-dorohedoro/ttyrec-player-web"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center hover:text-gray-500 transition-colors"
+        >
+          <span>GitHub</span>
+        </a>
+      </div>
     </div>
   );
 };

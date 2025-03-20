@@ -4,13 +4,14 @@ import TtyrecPlayer from "./components/TtyrecPlayer";
 import FileUploader from "./components/FileUploader";
 import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, GitMerge } from "lucide-react";
 import DrawDCSSCharacters, { ColorMaps } from "./components/Icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
 import Search from "./components/Search";
 import { formatSize } from "./lib/utils";
+import mergeTtyrecFiles from "./lib/mergeTtyrecs";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -140,10 +141,14 @@ const App = () => {
   } = useBz2DecompressWorker();
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
+  // 선택된 파일들의 캐시 상태를 저장
+  const [fileBuffers, setFileBuffers] = useState<ArrayBuffer[]>([]);
+  const [isMerging, setIsMerging] = useState<boolean>(false);
 
   const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
     setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
+    setFileBuffers([]); // 파일 선택 시 버퍼 초기화
   };
 
   const playNextFile = () => {
@@ -171,12 +176,79 @@ const App = () => {
     } else if (indexToRemove < currentFileIndex) {
       setCurrentFileIndex(currentFileIndex - 1); // 현재 index 조정
     }
+
+    // 파일 버퍼도 업데이트
+    const updatedBuffers = [...fileBuffers];
+    if (updatedBuffers.length > indexToRemove) {
+      updatedBuffers.splice(indexToRemove, 1);
+      setFileBuffers(updatedBuffers);
+    }
   };
 
   const handleReset = () => {
     clearCache();
     setSelectedFiles([]);
     setCurrentFileIndex(0);
+    setFileBuffers([]);
+  };
+
+  // 파일 병합 함수
+  const handleMergeFiles = async () => {
+    if (selectedFiles.length < 2) {
+      alert("병합하려면 2개 이상의 파일이 필요합니다.");
+      return;
+    }
+
+    setIsMerging(true);
+
+    try {
+      // 모든 파일이 버퍼에 로드되었는지 확인
+      if (fileBuffers.length !== selectedFiles.length) {
+        alert("모든 파일이 로드될 때까지 기다려주세요.");
+        setIsMerging(false);
+        return;
+      }
+
+      // 파일 병합
+      const mergedBuffer = mergeTtyrecFiles(fileBuffers);
+
+      // 병합된 파일 생성
+      const mergedBlob = new Blob([mergedBuffer], {
+        type: "application/octet-stream",
+      });
+      const mergedFile = new File([mergedBlob], "merged_ttyrec.ttyrec", {
+        type: "application/octet-stream",
+      });
+
+      // 병합된 파일을 선택된 파일 목록으로 설정
+      setSelectedFiles([mergedFile]);
+      setCurrentFileIndex(0);
+      setFileBuffers([mergedBuffer]);
+
+      // 성공 메시지
+      alert("파일이 성공적으로 병합되었습니다.");
+    } catch (error) {
+      console.error("파일 병합 중 오류 발생:", error);
+      alert("파일 병합 중 오류가 발생했습니다.");
+    } finally {
+      setIsMerging(false);
+    }
+  };
+
+  // 파일 버퍼 로드 함수
+  const loadFileBuffer = async (file: File | Blob): Promise<ArrayBuffer> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result instanceof ArrayBuffer) {
+          resolve(reader.result);
+        } else {
+          reject(new Error("파일을 ArrayBuffer로 변환할 수 없습니다."));
+        }
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   useEffect(() => {
@@ -200,6 +272,56 @@ const App = () => {
     }
   }, [status, result]);
 
+  // 선택된 파일의 ArrayBuffer를 로드
+  useEffect(() => {
+    const loadBuffers = async () => {
+      // 기존 버퍼를 유지하면서 새로운 버퍼 배열 초기화
+      const newBuffers = [...fileBuffers];
+      let buffersChanged = false;
+
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+
+        // 이미 해당 인덱스에 버퍼가 존재하면 스킵
+        if (newBuffers[i]) continue;
+
+        try {
+          if (file.name.endsWith(".bz2")) {
+            // 압축 파일인 경우
+            if (
+              status === States.COMPLETED &&
+              result &&
+              currentFileIndex === i
+            ) {
+              // 현재 압축 해제된 파일이 있고, 인덱스가 일치하면 사용
+              const buffer = await loadFileBuffer(result);
+              newBuffers[i] = buffer;
+              buffersChanged = true;
+              console.log(`압축 해제된 파일 버퍼 로드 완료: ${file.name}`);
+            }
+          } else {
+            // 일반 파일인 경우 바로 로드
+            const buffer = await loadFileBuffer(file);
+            newBuffers[i] = buffer;
+            buffersChanged = true;
+            console.log(`일반 파일 버퍼 로드 완료: ${file.name}`);
+          }
+        } catch (error) {
+          console.error(`파일 버퍼 로드 실패: ${file.name}`, error);
+        }
+      }
+
+      // 버퍼가 변경된 경우에만 상태 업데이트
+      if (buffersChanged) {
+        setFileBuffers(newBuffers);
+      }
+    };
+
+    if (selectedFiles.length > 0) {
+      loadBuffers();
+    }
+  }, [selectedFiles, result, status, currentFileIndex, fileBuffers]);
+
   return (
     <div className="relative mx-auto xl:py-8 py-4">
       {cacheStats && (
@@ -214,13 +336,24 @@ const App = () => {
           <DrawDCSSCharacters chars={titleChars} />
         </h1>
         {selectedFiles.length > 0 && (
-          <Button
-            size="sm"
-            onClick={handleReset}
-            className="absolute -right-[95px] cursor-pointer"
-          >
-            <RotateCcw className="w-4 h-4" /> 초기화{/* Reset */}
-          </Button>
+          <div className="absolute -right-[150px] flex gap-2">
+            {selectedFiles.length >= 2 && (
+              <Button
+                size="sm"
+                onClick={handleMergeFiles}
+                disabled={
+                  isMerging || fileBuffers.length !== selectedFiles.length
+                }
+                className="cursor-pointer"
+                title={`파일 버퍼: ${fileBuffers.length}/${selectedFiles.length}`}
+              >
+                <GitMerge className="w-4 h-4 mr-1" /> 파일 병합
+              </Button>
+            )}
+            <Button size="sm" onClick={handleReset} className="cursor-pointer">
+              <RotateCcw className="w-4 h-4" /> 초기화
+            </Button>
+          </div>
         )}
       </div>
       {!selectedFiles.length ? (

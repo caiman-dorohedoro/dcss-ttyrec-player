@@ -63,12 +63,15 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
     return trimmedText.length > 2;
   };
 
-  const handleSearchClick = async () => {
+  const handleSearchClick = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (file === null) return;
 
     if (!isSearchTextValid(searchText)) {
       setShowWarningDialog(true);
       setPendingSearch(true);
+      e.preventDefault();
       return;
     }
 
@@ -101,7 +104,7 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
           onChange={(e) => setSearchText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleSearchClick();
+              handleSearchClick(e);
             }
           }}
           placeholder={placeholder}

@@ -149,7 +149,7 @@ const App = () => {
   };
 
   // 실제 파일 병합을 처리하는 함수
-  const processMergeWithFiles = async (files: File[] | Blob[]) => {
+  const processMergeWithFiles = async (files: File[]) => {
     try {
       const fileBuffers = await Promise.all(
         files.map(async (file) => {
@@ -157,12 +157,25 @@ const App = () => {
         })
       );
 
+      // firstFileName__lastFileName.ttyrec
+      const fileName = files.reduce((acc, file, index) => {
+        if (index === 0) {
+          return file.name.replace(".ttyrec", "");
+        }
+
+        if (index === files.length - 1) {
+          return `${acc}__${file.name.replace(".ttyrec", "")}`;
+        }
+
+        return acc;
+      }, "");
+
       const mergedBuffer = mergeTtyrecFiles(fileBuffers);
 
       const mergedBlob = new Blob([mergedBuffer], {
         type: "application/octet-stream",
       });
-      const mergedFile = new File([mergedBlob], "merged_ttyrec.ttyrec", {
+      const mergedFile = new File([mergedBlob], `${fileName}.ttyrec`, {
         type: "application/octet-stream",
       });
 

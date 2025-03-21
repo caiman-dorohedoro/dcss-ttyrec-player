@@ -3,6 +3,8 @@ import { Package, PackageOpen, XCircle } from "lucide-react";
 import { States } from "@/types/decompressWorker";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/label";
+import { Button } from "./ui/button";
 
 interface PlaylistProps {
   className?: string;
@@ -15,6 +17,7 @@ interface PlaylistProps {
   isMergeMode: boolean;
   selectedMergeFiles: File[];
   onMergeFileSelect: (index: number) => void;
+  onBatchSelect: () => void;
 }
 
 const Playlist: React.FC<PlaylistProps> = ({
@@ -28,6 +31,7 @@ const Playlist: React.FC<PlaylistProps> = ({
   isMergeMode,
   selectedMergeFiles,
   onMergeFileSelect,
+  onBatchSelect,
 }) => {
   const isCompressedFile = (fileName: string) => {
     return fileName.endsWith(".bz2");
@@ -49,6 +53,22 @@ const Playlist: React.FC<PlaylistProps> = ({
     <div className={cn("relative", className)}>
       {files.length > 0 ? (
         <ul className="border rounded-md overflow-hidden max-h-[546px] overflow-y-auto scrollbar-thin scrollbar-thumb-accent scrollbar-track-transparent">
+          {isMergeMode && (
+            <li className="px-2 py-2 gap-x-2 flex justify-start items-center">
+              <Checkbox
+                id="batch-select"
+                className="w-[22px] h-[22px]"
+                checked={selectedMergeFiles.length === files.length}
+                onCheckedChange={onBatchSelect}
+              />
+              <Label
+                className="hover:cursor-pointer hover:text-gray-500"
+                htmlFor="batch-select"
+              >
+                전체 선택
+              </Label>
+            </li>
+          )}
           {files.map((file, index) => (
             <li
               key={index}
@@ -67,7 +87,7 @@ const Playlist: React.FC<PlaylistProps> = ({
               {isMergeMode && (
                 <>
                   <Checkbox
-                    className="w-[22px] h-[22px]"
+                    className="w-[22px] h-[22px] hover:cursor-pointer"
                     checked={selectedMergeFiles.includes(file)}
                     onCheckedChange={() => onMergeFileSelect(index)}
                     checkEl={

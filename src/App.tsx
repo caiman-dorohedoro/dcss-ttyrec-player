@@ -202,6 +202,26 @@ const App = () => {
     });
   };
 
+  const handleBatchSelect = () => {
+    if (selectedMergeFiles.length === selectedFiles.length) {
+      setSelectedMergeFiles([]);
+      return;
+    }
+
+    if (selectedMergeFiles.length !== 0) {
+      setSelectedMergeFiles((_selectedFiles) => {
+        const notSelectedFiles = selectedFiles.filter(
+          (file) => !_selectedFiles.includes(file)
+        );
+
+        return [..._selectedFiles, ...notSelectedFiles];
+      });
+      return;
+    }
+
+    setSelectedMergeFiles(selectedFiles);
+  };
+
   const handleReset = () => {
     clearCache();
     setSelectedFiles([]);
@@ -325,6 +345,7 @@ const App = () => {
                   isMergeMode={isMergeMode}
                   selectedMergeFiles={selectedMergeFiles}
                   onMergeFileSelect={(index) => handleMergeFileSelect(index)}
+                  onBatchSelect={handleBatchSelect}
                 />
                 {isMergeMode && (
                   <Button

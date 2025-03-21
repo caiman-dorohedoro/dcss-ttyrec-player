@@ -64,7 +64,9 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
   };
 
   const handleSearchClick = async (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e:
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.MouseEvent<HTMLButtonElement>
   ) => {
     if (file === null) return;
 

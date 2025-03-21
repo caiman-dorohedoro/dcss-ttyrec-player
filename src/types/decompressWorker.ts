@@ -26,6 +26,7 @@ export enum WorkerIncomingMessageType {
   DECOMPRESS = "decompress",
   CACHE_STATS = "cache_stats",
   CLEAR_CACHE = "clear_cache",
+  DECOMPRESS_BATCH = "decompress_batch",
 }
 
 export type DecompressMessage = {
@@ -73,22 +74,41 @@ export type ErrorMessage = {
   error: string;
 };
 
+export type DecompressBatchMessage = {
+  type: WorkerIncomingMessageType.DECOMPRESS_BATCH;
+  files: File[];
+};
+
+export type DecompressBatchResultMessage = {
+  type: WorkerOutgoingMessageType.DECOMPRESS_RESULT;
+  batchData: Blob[];
+  originalFiles: File[];
+};
+
 export type WorkerOutgoingMessage =
   | DecompressResultMessage
   | StatusMessage
   | ErrorMessage
   | CacheStatsResultMessage
   | CacheDisposedMessage
-  | CacheCachedFileNameMessage;
+  | CacheCachedFileNameMessage
+  | DecompressBatchResultMessage;
 
 export type WorkerIncomingMessage =
   | DecompressMessage
   | CacheStatsMessage
-  | ClearCacheMessage;
+  | ClearCacheMessage
+  | DecompressBatchMessage;
 
 // 타입 가드
 export const isDecompressMessage = (
   e: MessageEvent<WorkerIncomingMessage>
 ): e is MessageEvent<DecompressMessage> => {
   return e.data.type === WorkerIncomingMessageType.DECOMPRESS;
+};
+
+export const isDecompressBatchMessage = (
+  e: MessageEvent<WorkerIncomingMessage>
+): e is MessageEvent<DecompressBatchMessage> => {
+  return e.data.type === WorkerIncomingMessageType.DECOMPRESS_BATCH;
 };

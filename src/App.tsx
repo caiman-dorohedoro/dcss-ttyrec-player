@@ -35,6 +35,8 @@ const App = () => {
     result,
     status,
     decompressFile,
+    batchResults,
+    decompressBatch,
     cacheStats,
     clearCache,
     cachedFileNames,
@@ -98,13 +100,72 @@ const App = () => {
   const handleMergeFiles = async () => {
     setIsMerging(true);
 
-    const fileBuffers = await Promise.all(
-      selectedMergeFiles.map(async (file) => {
-        return await loadFileBuffer(file);
-      })
-    );
+    try {
+      // 압축 파일이 있는지 확인
+      const compressedFiles = selectedMergeFiles.filter((file) =>
+        file.name.endsWith(".bz2")
+      );
+
+      if (compressedFiles.length > 0) {
+        // 압축 파일이 있는 경우 모두 압축 해제 먼저 진행
+        await decompressBatch(compressedFiles);
+      } else {
+        // 압축 파일이 없는 경우 바로 병합 진행
+        await processMergeWithFiles(selectedMergeFiles);
+      }
+    } catch (error) {
+      console.error("파일 병합 중 오류 발생:", error);
+      setDialogTitle("파일 병합 중 오류 발생");
+      setDialogDescription("파일 병합 중 오류가 발생했습니다.");
+      setShowDialog(true);
+      setIsMerging(false);
+    }
+  };
+
+  // 압축 해제된 파일 결과를 처리하는 함수
+  const processMergeWithDecompressedFiles = async () => {
+    if (!batchResults) return;
 
     try {
+      // 압축 해제된 파일과 기존 비압축 파일 합치기
+      const nonCompressedFiles = selectedMergeFiles.filter(
+        (file) => !file.name.endsWith(".bz2")
+      );
+
+      // 압축 해제된 파일과 비압축 파일 합치기
+      const allFiles = [
+        ...nonCompressedFiles,
+        ...batchResults.blobs.map((blob, index) => {
+          // 원본 파일명에서 .bz2 확장자 제거
+          const originalName = batchResults.originalFiles[index].name;
+          const cleanName = originalName.endsWith(".bz2")
+            ? originalName.slice(0, -4)
+            : originalName;
+
+          return new File([blob], cleanName, { type: blob.type });
+        }),
+      ];
+
+      // 병합 처리
+      await processMergeWithFiles(allFiles);
+    } catch (error) {
+      console.error("압축 해제 후 병합 중 오류 발생:", error);
+      setDialogTitle("파일 병합 중 오류 발생");
+      setDialogDescription("압축 해제 후 병합 중 오류가 발생했습니다.");
+      setShowDialog(true);
+      setIsMerging(false);
+    }
+  };
+
+  // 실제 파일 병합을 처리하는 함수
+  const processMergeWithFiles = async (files: File[] | Blob[]) => {
+    try {
+      const fileBuffers = await Promise.all(
+        files.map(async (file) => {
+          return await loadFileBuffer(file);
+        })
+      );
+
       const mergedBuffer = mergeTtyrecFiles(fileBuffers);
 
       const mergedBlob = new Blob([mergedBuffer], {
@@ -177,6 +238,13 @@ const App = () => {
       setSafeFile(result);
     }
   }, [status, result]);
+
+  // 배치 압축 해제 결과 감시를 위한 새로운 useEffect
+  useEffect(() => {
+    if (batchResults && isMerging) {
+      processMergeWithDecompressedFiles();
+    }
+  }, [batchResults]);
 
   return (
     <div className="relative mx-auto xl:py-8 py-4">

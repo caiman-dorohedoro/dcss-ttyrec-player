@@ -78,16 +78,12 @@ const Playlist: React.FC<PlaylistProps> = ({
                   ></Checkbox>
                 </>
               )}
-              {!isMergeMode && (
-                <>
-                  {isCompressedFile(file.name) &&
-                    !isDecompressedResultCachedFile(file.name) && (
-                      <Package className="min-w-6 min-h-6 w-6 h-6" />
-                    )}
-                  {isDecompressedResultCachedFile(file.name) && (
-                    <PackageOpen className="min-w-6 min-h-6 w-6 h-6" />
-                  )}
-                </>
+              {isCompressedFile(file.name) &&
+                !isDecompressedResultCachedFile(file.name) && (
+                  <Package className="min-w-6 min-h-6 w-6 h-6" />
+                )}
+              {isDecompressedResultCachedFile(file.name) && (
+                <PackageOpen className="min-w-6 min-h-6 w-6 h-6" />
               )}
               <span className="truncate">{file.name}</span>
               <button

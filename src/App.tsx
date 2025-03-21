@@ -5,7 +5,7 @@ import FileUploader from "./components/FileUploader";
 import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
 import { RotateCcw, GitMerge } from "lucide-react";
-import DrawDCSSCharacters, { ColorMaps } from "./components/Icon";
+import Title from "@/components/Title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
@@ -45,98 +45,6 @@ const shortcuts = [
   },
   // { key: "?", description: "toggle this help popup" },
   { key: "?", description: "도움말 표시 / 숨김" },
-];
-
-const logoChars = [
-  {
-    char: "@",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg["#d9d9d9"],
-  },
-  {
-    char: ".",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg["#d9d9d9"],
-  },
-  {
-    char: ".",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg["#d9d9d9"],
-  },
-  {
-    char: ".",
-    fgColor: ColorMaps.fg["#d9d9d9"],
-    bgColor: ColorMaps.bg.black,
-  },
-  {
-    char: " ",
-  },
-];
-
-const titleChars = [
-  {
-    char: "T",
-    fgColor: ColorMaps.fg["#ddaf3c"],
-    bgColor: ColorMaps.bg.black,
-  },
-  {
-    char: "†",
-    fgColor: ColorMaps.fg["#26b0d7"],
-    bgColor: ColorMaps.bg["#ddaf3c"],
-  },
-  {
-    char: "y",
-    fgColor: ColorMaps.fg["#4ebf22"],
-    bgColor: ColorMaps.bg.black,
-  },
-  {
-    char: "r",
-    fgColor: ColorMaps.fg["#d9d9d9"],
-    bgColor: ColorMaps.bg.black,
-  },
-  {
-    char: "e",
-    fgColor: ColorMaps.fg["#4ebf22"],
-    bgColor: ColorMaps.bg.black,
-  },
-  {
-    char: "c",
-    fgColor: ColorMaps.fg["#26b0d7"],
-    bgColor: ColorMaps.bg.black,
-  },
-  {
-    char: " ",
-  },
-  {
-    char: "P",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg.transparent,
-  },
-  {
-    char: "l",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg.transparent,
-  },
-  {
-    char: "a",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg.transparent,
-  },
-  {
-    char: "y",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg.transparent,
-  },
-  {
-    char: "e",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg.transparent,
-  },
-  {
-    char: "r",
-    fgColor: ColorMaps.fg.black,
-    bgColor: ColorMaps.bg.transparent,
-  },
 ];
 
 const App = () => {
@@ -301,8 +209,7 @@ const App = () => {
       )}
       <div className="mx-auto lg:relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
-          <DrawDCSSCharacters chars={logoChars} />
-          <DrawDCSSCharacters chars={titleChars} />
+          <Title />
         </h1>
         {selectedFiles.length > 0 && (
           <div className="absolute right-[20px] lg:-right-[150px] flex gap-2">

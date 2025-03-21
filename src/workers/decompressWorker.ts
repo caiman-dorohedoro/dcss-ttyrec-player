@@ -10,6 +10,8 @@ import {
   WorkerOutgoingMessage,
   DecompressMessage,
   isDecompressMessage,
+  isDecompressBatchMessage,
+  DecompressBatchMessage,
 } from "../types/decompressWorker";
 
 const postMessage = (message: WorkerOutgoingMessage) => {
@@ -124,10 +126,52 @@ const handleIncomingDecompressRequest = async (
   updateState(States.COMPLETED);
 };
 
+// 새로운 함수: 여러 파일 압축 해제 처리
+const handleIncomingDecompressBatchRequest = async (
+  e: MessageEvent<DecompressBatchMessage>
+) => {
+  if (!e.data.files || e.data.files.length === 0) {
+    throw new Error("No files provided");
+  }
+
+  updateState(States.DECOMPRESSING);
+
+  const results: Blob[] = [];
+
+  // 각 파일을 압축 해제
+  for (const file of e.data.files) {
+    // 캐시에서 확인
+    const cachedData = cache.get(file.name);
+
+    if (cachedData) {
+      results.push(cachedData);
+    } else {
+      // 압축 해제 수행
+      const blob = await decompressFile(file);
+
+      // LRU 캐시에 저장
+      setCacheItem(file.name, blob);
+
+      results.push(blob);
+    }
+  }
+
+  // 모든 파일 압축 해제 결과 전송
+  postMessage({
+    type: WorkerOutgoingMessageType.DECOMPRESS_RESULT,
+    batchData: results,
+    originalFiles: e.data.files,
+  });
+
+  updateState(States.COMPLETED);
+};
+
 self.onmessage = async (e: MessageEvent<WorkerIncomingMessage>) => {
   try {
     if (isDecompressMessage(e)) {
       handleIncomingDecompressRequest(e);
+    } else if (isDecompressBatchMessage(e)) {
+      handleIncomingDecompressBatchRequest(e);
     } else if (e.data.type === WorkerIncomingMessageType.CACHE_STATS) {
       sendCacheStats();
     } else if (e.data.type === WorkerIncomingMessageType.CLEAR_CACHE) {

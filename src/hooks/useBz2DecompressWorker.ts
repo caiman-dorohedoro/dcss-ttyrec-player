@@ -17,6 +17,10 @@ const postMessage = (worker: Worker, message: WorkerIncomingMessage) => {
 const useBz2DecompressWorker = () => {
   const [status, setStatus] = useState<State>(States.INIT);
   const [result, setResult] = useState<Blob | null>(null);
+  const [batchResults, setBatchResults] = useState<{
+    blobs: Blob[];
+    originalFiles: File[];
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -33,7 +37,17 @@ const useBz2DecompressWorker = () => {
       }
 
       if (e.data.type === WorkerOutgoingMessageType.DECOMPRESS_RESULT) {
-        setResult(e.data.data || null);
+        // 단일 파일 압축 해제 결과
+        if ("data" in e.data) {
+          setResult(e.data.data || null);
+        }
+        // 배치 파일 압축 해제 결과
+        else if ("batchData" in e.data && "originalFiles" in e.data) {
+          setBatchResults({
+            blobs: e.data.batchData,
+            originalFiles: e.data.originalFiles,
+          });
+        }
 
         return;
       }
@@ -105,6 +119,26 @@ const useBz2DecompressWorker = () => {
     [worker]
   );
 
+  // 새로운 함수: 여러 파일 동시에 압축 해제
+  const decompressBatch = useCallback(
+    async (files: File[]) => {
+      if (!worker) return;
+
+      try {
+        setError(null);
+        setBatchResults(null);
+
+        postMessage(worker, {
+          type: WorkerIncomingMessageType.DECOMPRESS_BATCH,
+          files,
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      }
+    },
+    [worker]
+  );
+
   const clearCache = useCallback(() => {
     if (!worker) return;
 
@@ -114,9 +148,11 @@ const useBz2DecompressWorker = () => {
   return {
     status,
     result,
+    batchResults,
     error,
     cacheStats,
     decompressFile,
+    decompressBatch, // 새로운 함수 export
     clearCache,
     cachedFileNames,
   };

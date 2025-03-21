@@ -165,6 +165,7 @@ const App = () => {
     setSelectedFiles(files);
     setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
     setSelectedMergeFiles([]); // 파일 선택 시 병합 모드 해제
+    setIsMergeMode(false);
   };
 
   const playNextFile = () => {

@@ -194,13 +194,6 @@ const App = () => {
     } else if (indexToRemove < currentFileIndex) {
       setCurrentFileIndex(currentFileIndex - 1); // 현재 index 조정
     }
-
-    // // 파일 버퍼도 업데이트
-    // const updatedBuffers = [...fileBuffers];
-    // if (updatedBuffers.length > indexToRemove) {
-    //   updatedBuffers.splice(indexToRemove, 1);
-    //   setFileBuffers(updatedBuffers);
-    // }
   };
 
   const handleMergeFileSelect = (index: number) => {
@@ -224,10 +217,8 @@ const App = () => {
     );
 
     try {
-      // 파일 병합
       const mergedBuffer = mergeTtyrecFiles(fileBuffers);
 
-      // 병합된 파일 생성
       const mergedBlob = new Blob([mergedBuffer], {
         type: "application/octet-stream",
       });
@@ -307,13 +298,13 @@ const App = () => {
           {formatSize(cacheStats.maxSize)}
         </div>
       )}
-      <div className="mx-auto relative w-auto inline-flex items-center mb-4">
+      <div className="mx-auto lg:relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
           <DrawDCSSCharacters chars={logoChars} />
           <DrawDCSSCharacters chars={titleChars} />
         </h1>
         {selectedFiles.length > 0 && (
-          <div className="absolute -right-[150px] flex gap-2">
+          <div className="absolute right-[20px] lg:-right-[150px] flex gap-2">
             <Button size="sm" onClick={handleReset} className="cursor-pointer">
               <RotateCcw className="w-4 h-4" /> 초기화
             </Button>

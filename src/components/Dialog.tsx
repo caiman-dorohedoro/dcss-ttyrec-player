@@ -27,8 +27,8 @@ const Dialog = ({
   description,
   onCancel,
   onConfirm,
-  cancelText = "취소",
-  confirmText = "계속하기",
+  cancelText,
+  confirmText,
 }: DialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

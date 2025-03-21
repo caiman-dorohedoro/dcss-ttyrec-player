@@ -13,83 +13,56 @@ interface TtyrecFrame {
  */
 const mergeTtyrecFiles = (files: ArrayBuffer[]): ArrayBuffer => {
   const mergedFrames: TtyrecFrame[] = [];
-  const currentTime: { sec: number; usec: number } = { sec: 0, usec: 0 }; // 누적 시간
+  let currentSec = 0;
 
-  files.forEach((file: ArrayBuffer, fileIndex: number) => {
+  const fileFrames: TtyrecFrame[][] = files.map((file: ArrayBuffer) => {
     const view = new DataView(file);
-    let offset = 0;
-    const fileFrames: TtyrecFrame[] = [];
+    const frames: TtyrecFrame[] = [];
 
-    // 프레임 파싱
+    let offset = 0;
     while (offset < file.byteLength) {
       const sec = view.getUint32(offset, true);
       const usec = view.getUint32(offset + 4, true);
       const len = view.getUint32(offset + 8, true);
       const data = new Uint8Array(file, offset + 12, len);
-      fileFrames.push({ sec, usec, len, data });
+      frames.push({ sec, usec, len, data });
       offset += 12 + len;
     }
 
-    if (fileFrames.length > 0) {
-      const firstFrame = fileFrames[0];
-      const baseSec = firstFrame.sec;
-      const baseUsec = firstFrame.usec;
+    return frames;
+  });
 
-      // 파일의 프레임을 상대적인 시간으로 변환
-      fileFrames.forEach((frame) => {
-        let relativeSec = frame.sec - baseSec;
-        let relativeUsec = frame.usec - baseUsec;
+  fileFrames.forEach((frames) => {
+    const [firstFrame] = frames;
+    const baseSec = firstFrame.sec;
+    const diffSec = baseSec - currentSec < 1 ? 1 : baseSec - currentSec;
 
-        // 음수 usec 보정
-        while (relativeUsec < 0) {
-          relativeSec -= 1;
-          relativeUsec += 1000000;
-        }
+    const newFrames = frames.map((frame) => {
+      const sec = currentSec === 0 ? 0 : frame.sec - diffSec;
 
-        // 누적 시간에 상대적인 시간 추가
-        let adjustedSec = currentTime.sec + relativeSec;
-        let adjustedUsec = currentTime.usec + relativeUsec;
+      const result = {
+        sec,
+        usec: frame.usec,
+        len: frame.len,
+        data: frame.data,
+      };
 
-        // usec가 1,000,000 이상일 경우 sec 증가
-        while (adjustedUsec >= 1000000) {
-          adjustedSec += 1;
-          adjustedUsec -= 1000000;
-        }
-
-        mergedFrames.push({
-          sec: adjustedSec,
-          usec: adjustedUsec,
-          len: frame.len,
-          data: frame.data,
-        });
-      });
-
-      // 파일의 마지막 프레임 시간 계산
-      const lastFrame = fileFrames[fileFrames.length - 1];
-      let totalSec = lastFrame.sec - baseSec;
-      let totalUsec = lastFrame.usec - baseUsec;
-
-      // 음수 usec 보정
-      while (totalUsec < 0) {
-        totalSec -= 1;
-        totalUsec += 1000000;
+      if (result.usec < 0) {
+        result.sec -= 1;
+        result.usec += 1000000;
       }
 
-      // 누적 시간 업데이트
-      currentTime.sec += totalSec;
-      currentTime.usec += totalUsec;
-
-      // usec가 1,000,000 이상일 경우 sec 증가
-      while (currentTime.usec >= 1000000) {
-        currentTime.sec += 1;
-        currentTime.usec -= 1000000;
+      if (result.usec >= 1000000) {
+        result.sec += 1;
+        result.usec -= 1000000;
       }
 
-      // 파일 간 1초 간격 추가 (마지막 파일 제외)
-      if (fileIndex < files.length - 1) {
-        currentTime.sec += 1;
-      }
-    }
+      return result;
+    });
+
+    currentSec = newFrames[newFrames.length - 1].sec + 1;
+
+    mergedFrames.push(...newFrames);
   });
 
   // 합쳐진 프레임을 바이너리 데이터로 변환

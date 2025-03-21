@@ -190,7 +190,7 @@ const App = () => {
             <div className="bg-gray-200 w-[1px] h-3 self-center"></div>
           </>
         )}
-        <div className="text-right text-xs text-gray-500">
+        <div className="text-right text-xs text-gray-500 lg:mr-0 mr-2">
           <a
             href="https://github.com/caiman-dorohedoro/dcss-ttyrec-player"
             target="_blank"
@@ -208,7 +208,8 @@ const App = () => {
         {selectedFiles.length > 0 && (
           <div className="absolute right-[20px] lg:-right-[150px] flex gap-2">
             <Button size="sm" onClick={handleReset} className="cursor-pointer">
-              <RotateCcw className="w-4 h-4" /> 초기화
+              <RotateCcw className="w-4 h-4" />
+              <span className="hidden lg:inline"> 초기화</span>
             </Button>
           </div>
         )}

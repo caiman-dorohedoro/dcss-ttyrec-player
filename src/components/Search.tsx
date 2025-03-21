@@ -6,16 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import Dialog from "@/components/Dialog";
 
 type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
@@ -124,40 +115,24 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
         </Button>
       </div>
 
-      <AlertDialog open={showWarningDialog} onOpenChange={setShowWarningDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>검색어 확인</AlertDialogTitle>
-            <AlertDialogDescription>
-              검색어가 비어있거나 너무 짧아 검색에 오래 걸릴 수 있습니다 (3글자
-              이상 권장). 계속 진행하시겠습니까?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              className="hover:cursor-pointer"
-              onClick={() => {
-                setPendingSearch(false);
-                setShowWarningDialog(false);
-              }}
-            >
-              취소
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="hover:cursor-pointer"
-              onClick={() => {
-                setShowWarningDialog(false);
-                if (pendingSearch) {
-                  executeSearch();
-                }
-              }}
-            >
-              계속하기
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog
+        open={showWarningDialog}
+        onOpenChange={setShowWarningDialog}
+        title="검색어 확인"
+        description="검색어가 비어있거나 너무 짧아 검색에 오래 걸릴 수 있습니다 (3글자
+              이상 권장). 계속 진행하시겠습니까?"
+        onCancel={() => {
+          setPendingSearch(false);
+          setShowWarningDialog(false);
+        }}
+        onConfirm={() => {
+          setShowWarningDialog(false);
 
+          if (pendingSearch) {
+            executeSearch();
+          }
+        }}
+      />
       {searchStatus === SearchStates.SEARCHING && (
         <Card className="p-4 rounded-sm flex items-center justify-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />

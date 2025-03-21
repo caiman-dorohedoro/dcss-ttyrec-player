@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Package, PackageOpen, XCircle } from "lucide-react";
 import { States } from "@/types/decompressWorker";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "./ui/checkbox";
 
 interface PlaylistProps {
   className?: string;
@@ -11,6 +12,9 @@ interface PlaylistProps {
   currentFileIndex: number;
   onFileRemove: (index: number) => void;
   onFileSelect: (index: number) => void;
+  isMergeMode: boolean;
+  selectedMergeFiles: File[];
+  onMergeFileSelect: (index: number) => void;
 }
 
 const Playlist: React.FC<PlaylistProps> = ({
@@ -21,6 +25,9 @@ const Playlist: React.FC<PlaylistProps> = ({
   onFileRemove,
   onFileSelect,
   className,
+  isMergeMode,
+  selectedMergeFiles,
+  onMergeFileSelect,
 }) => {
   const isCompressedFile = (fileName: string) => {
     return fileName.endsWith(".bz2");
@@ -28,6 +35,14 @@ const Playlist: React.FC<PlaylistProps> = ({
 
   const isDecompressedResultCachedFile = (fileName: string) => {
     return isCompressedFile(fileName) && cachedFileNames.includes(fileName);
+  };
+
+  const handleClick = (index: number) => {
+    if (isMergeMode) {
+      onMergeFileSelect(index);
+    } else {
+      onFileSelect(index);
+    }
   };
 
   return (
@@ -38,19 +53,42 @@ const Playlist: React.FC<PlaylistProps> = ({
             <li
               key={index}
               className={`xl:max-w-[300px] max-w-[700px] px-2 py-2 gap-x-0.5 border-b last:border-b-0  hover:bg-gray-100 ${
-                currentFileIndex === index ? "bg-blue-100" : ""
+                !isMergeMode && currentFileIndex === index ? "bg-blue-100" : ""
               } 
               ${
                 status === States.DECOMPRESSING && currentFileIndex !== index
                   ? "cursor-not-allowed bg-gray-100"
                   : "cursor-pointer"
               }
+              ${isMergeMode && "gap-x-1"}
               flex items-center justify-between`}
-              onClick={() => onFileSelect(index)}
+              onClick={() => handleClick(index)}
             >
-              {isCompressedFile(file.name) &&
-                !isDecompressedResultCachedFile(file.name) && <Package />}
-              {isDecompressedResultCachedFile(file.name) && <PackageOpen />}
+              {isMergeMode && (
+                <>
+                  <Checkbox
+                    className="w-[22px] h-[22px]"
+                    checked={selectedMergeFiles.includes(file)}
+                    onCheckedChange={() => onMergeFileSelect(index)}
+                    checkEl={
+                      <span className="text-xs">
+                        {selectedMergeFiles.findIndex((f) => f === file) + 1}
+                      </span>
+                    }
+                  ></Checkbox>
+                </>
+              )}
+              {!isMergeMode && (
+                <>
+                  {isCompressedFile(file.name) &&
+                    !isDecompressedResultCachedFile(file.name) && (
+                      <Package className="min-w-6 min-h-6 w-6 h-6" />
+                    )}
+                  {isDecompressedResultCachedFile(file.name) && (
+                    <PackageOpen className="min-w-6 min-h-6 w-6 h-6" />
+                  )}
+                </>
+              )}
               <span className="truncate">{file.name}</span>
               <button
                 onClick={(e) => {

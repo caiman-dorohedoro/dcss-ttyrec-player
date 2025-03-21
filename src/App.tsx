@@ -11,7 +11,19 @@ import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
 import Search from "./components/Search";
 import { formatSize } from "./lib/utils";
+// import mergeTtyrecFiles from "./lib/mergeTtyrecs";
+import { Switch } from "./components/ui/switch";
+import { Label } from "./components/ui/label";
 import mergeTtyrecFiles from "./lib/mergeTtyrecs";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./components/ui/alert-dialog";
 
 const shortcuts = [
   // { key: "space", description: "pause / resume" },
@@ -129,6 +141,7 @@ const titleChars = [
 
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [tab, setTab] = useState<"playlist" | "search">("playlist");
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
   const [safeFile, setSafeFile] = useState<File | Blob | null>(null);
   const {
@@ -141,14 +154,17 @@ const App = () => {
   } = useBz2DecompressWorker();
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
-  // 선택된 파일들의 캐시 상태를 저장
-  const [fileBuffers, setFileBuffers] = useState<ArrayBuffer[]>([]);
+  const [selectedMergeFiles, setSelectedMergeFiles] = useState<File[]>([]);
+  const [isMergeMode, setIsMergeMode] = useState<boolean>(false);
   const [isMerging, setIsMerging] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [dialogTitle, setDialogTitle] = useState<string>("");
+  const [dialogDescription, setDialogDescription] = useState<string>("");
 
   const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
     setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
-    setFileBuffers([]); // 파일 선택 시 버퍼 초기화
+    setSelectedMergeFiles([]); // 파일 선택 시 병합 모드 해제
   };
 
   const playNextFile = () => {
@@ -166,7 +182,9 @@ const App = () => {
     const updatedFiles = selectedFiles.filter(
       (_, index) => index !== indexToRemove
     );
+
     setSelectedFiles(updatedFiles);
+
     if (indexToRemove === currentFileIndex) {
       if (updatedFiles.length > 0) {
         setCurrentFileIndex(0); // 삭제된 파일이 현재 파일이면, 다음 파일 (또는 첫 번째 파일) 재생
@@ -177,38 +195,35 @@ const App = () => {
       setCurrentFileIndex(currentFileIndex - 1); // 현재 index 조정
     }
 
-    // 파일 버퍼도 업데이트
-    const updatedBuffers = [...fileBuffers];
-    if (updatedBuffers.length > indexToRemove) {
-      updatedBuffers.splice(indexToRemove, 1);
-      setFileBuffers(updatedBuffers);
-    }
+    // // 파일 버퍼도 업데이트
+    // const updatedBuffers = [...fileBuffers];
+    // if (updatedBuffers.length > indexToRemove) {
+    //   updatedBuffers.splice(indexToRemove, 1);
+    //   setFileBuffers(updatedBuffers);
+    // }
   };
 
-  const handleReset = () => {
-    clearCache();
-    setSelectedFiles([]);
-    setCurrentFileIndex(0);
-    setFileBuffers([]);
+  const handleMergeFileSelect = (index: number) => {
+    if (selectedMergeFiles.includes(selectedFiles[index])) {
+      setSelectedMergeFiles(
+        selectedMergeFiles.filter((file) => file !== selectedFiles[index])
+      );
+    } else {
+      setSelectedMergeFiles([...selectedMergeFiles, selectedFiles[index]]);
+    }
   };
 
   // 파일 병합 함수
   const handleMergeFiles = async () => {
-    if (selectedFiles.length < 2) {
-      alert("병합하려면 2개 이상의 파일이 필요합니다.");
-      return;
-    }
-
     setIsMerging(true);
 
-    try {
-      // 모든 파일이 버퍼에 로드되었는지 확인
-      if (fileBuffers.length !== selectedFiles.length) {
-        alert("모든 파일이 로드될 때까지 기다려주세요.");
-        setIsMerging(false);
-        return;
-      }
+    const fileBuffers = await Promise.all(
+      selectedMergeFiles.map(async (file) => {
+        return await loadFileBuffer(file);
+      })
+    );
 
+    try {
       // 파일 병합
       const mergedBuffer = mergeTtyrecFiles(fileBuffers);
 
@@ -223,13 +238,18 @@ const App = () => {
       // 병합된 파일을 선택된 파일 목록으로 설정
       setSelectedFiles([mergedFile]);
       setCurrentFileIndex(0);
-      setFileBuffers([mergedBuffer]);
+      setSelectedMergeFiles([]);
+      setIsMergeMode(false);
 
       // 성공 메시지
-      alert("파일이 성공적으로 병합되었습니다.");
+      setDialogTitle("파일 병합 완료");
+      setDialogDescription("파일이 성공적으로 병합되었습니다.");
+      setShowDialog(true);
     } catch (error) {
       console.error("파일 병합 중 오류 발생:", error);
-      alert("파일 병합 중 오류가 발생했습니다.");
+      setDialogTitle("파일 병합 중 오류 발생");
+      setDialogDescription("파일 병합 중 오류가 발생했습니다.");
+      setShowDialog(true);
     } finally {
       setIsMerging(false);
     }
@@ -249,6 +269,13 @@ const App = () => {
       reader.onerror = () => reject(reader.error);
       reader.readAsArrayBuffer(file);
     });
+  };
+
+  const handleReset = () => {
+    clearCache();
+    setSelectedFiles([]);
+    setCurrentFileIndex(0);
+    setSelectedMergeFiles([]);
   };
 
   useEffect(() => {
@@ -272,56 +299,6 @@ const App = () => {
     }
   }, [status, result]);
 
-  // 선택된 파일의 ArrayBuffer를 로드
-  useEffect(() => {
-    const loadBuffers = async () => {
-      // 기존 버퍼를 유지하면서 새로운 버퍼 배열 초기화
-      const newBuffers = [...fileBuffers];
-      let buffersChanged = false;
-
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-
-        // 이미 해당 인덱스에 버퍼가 존재하면 스킵
-        if (newBuffers[i]) continue;
-
-        try {
-          if (file.name.endsWith(".bz2")) {
-            // 압축 파일인 경우
-            if (
-              status === States.COMPLETED &&
-              result &&
-              currentFileIndex === i
-            ) {
-              // 현재 압축 해제된 파일이 있고, 인덱스가 일치하면 사용
-              const buffer = await loadFileBuffer(result);
-              newBuffers[i] = buffer;
-              buffersChanged = true;
-              console.log(`압축 해제된 파일 버퍼 로드 완료: ${file.name}`);
-            }
-          } else {
-            // 일반 파일인 경우 바로 로드
-            const buffer = await loadFileBuffer(file);
-            newBuffers[i] = buffer;
-            buffersChanged = true;
-            console.log(`일반 파일 버퍼 로드 완료: ${file.name}`);
-          }
-        } catch (error) {
-          console.error(`파일 버퍼 로드 실패: ${file.name}`, error);
-        }
-      }
-
-      // 버퍼가 변경된 경우에만 상태 업데이트
-      if (buffersChanged) {
-        setFileBuffers(newBuffers);
-      }
-    };
-
-    if (selectedFiles.length > 0) {
-      loadBuffers();
-    }
-  }, [selectedFiles, result, status, currentFileIndex, fileBuffers]);
-
   return (
     <div className="relative mx-auto xl:py-8 py-4">
       {cacheStats && (
@@ -337,19 +314,6 @@ const App = () => {
         </h1>
         {selectedFiles.length > 0 && (
           <div className="absolute -right-[150px] flex gap-2">
-            {selectedFiles.length >= 2 && (
-              <Button
-                size="sm"
-                onClick={handleMergeFiles}
-                disabled={
-                  isMerging || fileBuffers.length !== selectedFiles.length
-                }
-                className="cursor-pointer"
-                title={`파일 버퍼: ${fileBuffers.length}/${selectedFiles.length}`}
-              >
-                <GitMerge className="w-4 h-4 mr-1" /> 파일 병합
-              </Button>
-            )}
             <Button size="sm" onClick={handleReset} className="cursor-pointer">
               <RotateCcw className="w-4 h-4" /> 초기화
             </Button>
@@ -366,24 +330,59 @@ const App = () => {
             status={status}
             onEnded={playNextFile}
           />
-          <Tabs defaultValue="playlist">
-            <TabsList>
-              <TabsTrigger value="playlist" className="hover:cursor-pointer">
-                플레이리스트
-              </TabsTrigger>
-              <TabsTrigger value="search" className="hover:cursor-pointer">
-                검색
-              </TabsTrigger>
-            </TabsList>
+          <Tabs
+            defaultValue="playlist"
+            onValueChange={(value) => setTab(value as "playlist" | "search")}
+          >
+            <div className="flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="playlist" className="hover:cursor-pointer">
+                  플레이리스트
+                </TabsTrigger>
+                <TabsTrigger value="search" className="hover:cursor-pointer">
+                  검색
+                </TabsTrigger>
+              </TabsList>
+              {tab === "playlist" && (
+                <div className="flex items-center hover:cursor-pointer hover:text-gray-700">
+                  <Label
+                    htmlFor="merge-mode"
+                    className="hover:cursor-pointer pr-2"
+                  >
+                    병합 모드
+                  </Label>
+                  <Switch
+                    id="merge-mode"
+                    className="hover:cursor-pointer hover:text-gray-500"
+                    checked={isMergeMode}
+                    onCheckedChange={setIsMergeMode}
+                  />
+                </div>
+              )}
+            </div>
             <TabsContent value="playlist">
-              <Playlist
-                files={selectedFiles}
-                cachedFileNames={cachedFileNames}
-                status={status}
-                currentFileIndex={currentFileIndex}
-                onFileRemove={handleFileRemove}
-                onFileSelect={(index) => setCurrentFileIndex(index)}
-              />
+              <div className="flex flex-col gap-2">
+                <Playlist
+                  files={selectedFiles}
+                  cachedFileNames={cachedFileNames}
+                  status={status}
+                  currentFileIndex={currentFileIndex}
+                  onFileRemove={handleFileRemove}
+                  onFileSelect={(index) => setCurrentFileIndex(index)}
+                  isMergeMode={isMergeMode}
+                  selectedMergeFiles={selectedMergeFiles}
+                  onMergeFileSelect={(index) => handleMergeFileSelect(index)}
+                />
+                {isMergeMode && (
+                  <Button
+                    disabled={selectedMergeFiles.length < 2}
+                    className="hover:cursor-pointer"
+                    onClick={handleMergeFiles}
+                  >
+                    파일 병합
+                  </Button>
+                )}
+              </div>
             </TabsContent>
             <TabsContent value="search">
               <Search
@@ -422,6 +421,19 @@ const App = () => {
           <span>GitHub</span>
         </a>
       </div>
+      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="hover:cursor-pointer">
+              확인
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

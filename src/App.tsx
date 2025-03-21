@@ -180,12 +180,27 @@ const App = () => {
 
   return (
     <div className="relative mx-auto xl:py-8 py-4">
-      {cacheStats && (
-        <div className="text-xs text-gray-500 mb-2 text-right">
-          압축 해제 캐시: {formatSize(cacheStats.currentSize)} /{" "}
-          {formatSize(cacheStats.maxSize)}
+      <div className="flex justify-end gap-2 mb-2">
+        {cacheStats && (
+          <>
+            <div className="text-xs text-gray-500 text-right">
+              압축 해제 캐시: {formatSize(cacheStats.currentSize)} /{" "}
+              {formatSize(cacheStats.maxSize)}
+            </div>
+            <div className="bg-gray-200 w-[1px] h-3 self-center"></div>
+          </>
+        )}
+        <div className="text-right text-xs text-gray-500">
+          <a
+            href="https://github.com/caiman-dorohedoro/dcss-ttyrec-player"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center hover:text-gray-400 transition-colors"
+          >
+            <span>GitHub</span>
+          </a>
         </div>
-      )}
+      </div>
       <div className="mx-auto lg:relative w-auto inline-flex items-center mb-4">
         <h1 className="xl:text-2xl text-lg font-bold text-center">
           <Title />
@@ -273,17 +288,6 @@ const App = () => {
         </div>
       )}
       {selectedFiles.length > 0 && <Shortcuts />}
-      {/* Footer with GitHub link */}
-      <div className="fixed bottom-4 right-4 text-xs text-gray-400 lg:right-[calc((100vw-500px)/2)] xl:right-[calc((100vw-896px)/2)]">
-        <a
-          href="https://github.com/caiman-dorohedoro/dcss-ttyrec-player"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center hover:text-gray-500 transition-colors"
-        >
-          <span>GitHub</span>
-        </a>
-      </div>
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -4,26 +4,17 @@ import TtyrecPlayer from "./components/TtyrecPlayer";
 import FileUploader from "./components/FileUploader";
 import Playlist from "./components/Playlist";
 import { Button } from "./components/ui/button";
-import { RotateCcw, GitMerge } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import Title from "@/components/Title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
 import Search from "./components/Search";
 import { formatSize } from "./lib/utils";
-// import mergeTtyrecFiles from "./lib/mergeTtyrecs";
 import { Switch } from "./components/ui/switch";
 import { Label } from "./components/ui/label";
 import mergeTtyrecFiles from "./lib/mergeTtyrecs";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "./components/ui/alert-dialog";
+import Dialog from "./components/Dialog";
 import Shortcuts from "./components/Shortcuts";
 
 const App = () => {
@@ -357,19 +348,13 @@ const App = () => {
         </div>
       )}
       {selectedFiles.length > 0 && <Shortcuts />}
-      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="hover:cursor-pointer">
-              확인
-            </AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        title={dialogTitle}
+        description={dialogDescription}
+        cancelText="확인"
+      />
     </div>
   );
 };

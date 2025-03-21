@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Package, PackageOpen, XCircle } from "lucide-react";
 import { States } from "@/types/decompressWorker";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
-import { Button } from "./ui/button";
 
 interface PlaylistProps {
   className?: string;

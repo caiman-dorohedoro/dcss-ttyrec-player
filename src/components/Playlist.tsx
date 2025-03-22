@@ -14,6 +14,7 @@ interface PlaylistProps {
   onFileRemove: (index: number) => void;
   onFileSelect: (index: number) => void;
   isMergeMode: boolean;
+  isMerging: boolean;
   selectedMergeFiles: File[];
   onMergeFileSelect: (index: number) => void;
   onBatchSelect: () => void;
@@ -28,6 +29,7 @@ const Playlist: React.FC<PlaylistProps> = ({
   onFileSelect,
   className,
   isMergeMode,
+  isMerging,
   selectedMergeFiles,
   onMergeFileSelect,
   onBatchSelect,
@@ -41,11 +43,23 @@ const Playlist: React.FC<PlaylistProps> = ({
   };
 
   const handleClick = (index: number) => {
+    if (isMerging) return;
+
     if (isMergeMode) {
       onMergeFileSelect(index);
     } else {
       onFileSelect(index);
     }
+  };
+
+  const handleRemove = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    index: number
+  ) => {
+    if (isMerging) return;
+
+    e.stopPropagation(); // 이벤트 버블링 방지
+    onFileRemove(index);
   };
 
   return (
@@ -56,12 +70,15 @@ const Playlist: React.FC<PlaylistProps> = ({
             <li className="px-2 py-2 gap-x-2 flex justify-start items-center">
               <Checkbox
                 id="batch-select"
+                disabled={isMerging}
                 className="w-[22px] h-[22px]"
                 checked={selectedMergeFiles.length === files.length}
                 onCheckedChange={onBatchSelect}
               />
               <Label
-                className="hover:cursor-pointer hover:text-gray-500"
+                className={`hover:cursor-pointer hover:text-gray-500 ${
+                  isMerging ? "cursor-not-allowed" : ""
+                }`}
                 htmlFor="batch-select"
               >
                 전체 선택
@@ -86,6 +103,7 @@ const Playlist: React.FC<PlaylistProps> = ({
               {isMergeMode && (
                 <>
                   <Checkbox
+                    disabled={isMerging}
                     className="w-[22px] h-[22px] hover:cursor-pointer"
                     checked={selectedMergeFiles.includes(file)}
                     onCheckedChange={() => onMergeFileSelect(index)}
@@ -107,8 +125,7 @@ const Playlist: React.FC<PlaylistProps> = ({
               <span className="truncate">{file.name}</span>
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // 이벤트 버블링 방지
-                  onFileRemove(index);
+                  handleRemove(e, index);
                 }}
                 className="ml-2 text-gray-500 hover:text-gray-700"
               >

@@ -62,7 +62,11 @@ const mergeTtyrecFiles = (files: ArrayBuffer[]): ArrayBuffer => {
 
     currentSec = newFrames[newFrames.length - 1].sec + 1;
 
-    mergedFrames.push(...newFrames);
+    // 대량의 배열을 spread 연산자로 합치면 stack overflow가 발생할 수 있음
+    // mergedFrames.push(...newFrames); 대신 for 루프 사용
+    for (let i = 0; i < newFrames.length; i++) {
+      mergedFrames.push(newFrames[i]);
+    }
   });
 
   // 합쳐진 프레임을 바이너리 데이터로 변환

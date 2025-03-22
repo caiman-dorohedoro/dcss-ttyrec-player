@@ -132,6 +132,8 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
             executeSearch();
           }
         }}
+        confirmText="검색"
+        cancelText="취소"
       />
       {searchStatus === SearchStates.SEARCHING && (
         <Card className="p-4 rounded-sm flex items-center justify-center gap-2">

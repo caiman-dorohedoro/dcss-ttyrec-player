@@ -340,6 +340,7 @@ const App = () => {
                   <Switch
                     id="merge-mode"
                     className="hover:cursor-pointer hover:text-gray-500"
+                    disabled={isMerging}
                     checked={isMergeMode}
                     onCheckedChange={setIsMergeMode}
                   />
@@ -356,13 +357,14 @@ const App = () => {
                   onFileRemove={handleFileRemove}
                   onFileSelect={(index) => setCurrentFileIndex(index)}
                   isMergeMode={isMergeMode}
+                  isMerging={isMerging}
                   selectedMergeFiles={selectedMergeFiles}
                   onMergeFileSelect={(index) => handleMergeFileSelect(index)}
                   onBatchSelect={handleBatchSelect}
                 />
                 {isMergeMode && (
                   <Button
-                    disabled={selectedMergeFiles.length < 2}
+                    disabled={selectedMergeFiles.length < 2 || isMerging}
                     className="hover:cursor-pointer"
                     onClick={handleMergeFiles}
                   >

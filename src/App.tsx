@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useBz2DecompressWorker from "./hooks/useBz2DecompressWorker";
 import { States } from "./types/decompressWorker";
 import Search from "./components/Search";
-import { formatSize } from "./lib/utils";
+import { downloadFile, formatSize } from "./lib/utils";
 import { Switch } from "./components/ui/switch";
 import { Label } from "./components/ui/label";
 import mergeTtyrecFiles from "./lib/mergeTtyrecs";
@@ -37,6 +37,7 @@ const App = () => {
   const [selectedMergeFiles, setSelectedMergeFiles] = useState<File[]>([]);
   const [isMergeMode, setIsMergeMode] = useState<boolean>(false);
   const [isMerging, setIsMerging] = useState<boolean>(false);
+  const [isMergedFile, setIsMergedFile] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [dialogTitle, setDialogTitle] = useState<string>("");
   const [dialogDescription, setDialogDescription] = useState<string>("");
@@ -46,6 +47,7 @@ const App = () => {
     setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
     setSelectedMergeFiles([]); // 파일 선택 시 병합 모드 해제
     setIsMergeMode(false);
+    setIsMergedFile(false);
   };
 
   const playNextFile = () => {
@@ -184,6 +186,7 @@ const App = () => {
       setCurrentFileIndex(0);
       setSelectedMergeFiles([]);
       setIsMergeMode(false);
+      setIsMergedFile(true);
 
       // 성공 메시지
       setDialogTitle("파일 병합 완료");
@@ -235,11 +238,16 @@ const App = () => {
     setSelectedMergeFiles(selectedFiles);
   };
 
+  const handleDownload = () => {
+    downloadFile(selectedFiles[0]);
+  };
+
   const handleReset = () => {
     clearCache();
     setSelectedFiles([]);
     setCurrentFileIndex(0);
     setSelectedMergeFiles([]);
+    setIsMergedFile(false);
   };
 
   useEffect(() => {
@@ -368,7 +376,19 @@ const App = () => {
                     className="hover:cursor-pointer"
                     onClick={handleMergeFiles}
                   >
-                    파일 병합
+                    {isMerging
+                      ? status === States.DECOMPRESSING
+                        ? "압축 해제 중..."
+                        : "파일 병합 중..."
+                      : "파일 병합"}
+                  </Button>
+                )}
+                {status === States.COMPLETED && !isMerging && isMergedFile && (
+                  <Button
+                    className="hover:cursor-pointer"
+                    onClick={handleDownload}
+                  >
+                    다운로드
                   </Button>
                 )}
               </div>

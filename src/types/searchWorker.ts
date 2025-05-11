@@ -23,8 +23,9 @@ export type StatusMessage = {
 
 export type SearchMessage = {
   type: MessageType.SEARCH;
-  searchText: string;
   data: ArrayBuffer;
+  searchText: string;
+  isRegexMode: boolean;
 };
 
 export type SearchResultMessage = {

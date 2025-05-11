@@ -40,7 +40,11 @@ export type TtyrecSearchResult = {
 };
 
 // ttyrec 파일에서 특정 텍스트를 검색하는 함수
-function searchTtyrec(data: ArrayBuffer, searchText: string) {
+function searchTtyrec(
+  data: ArrayBuffer,
+  searchText: string,
+  isRegexMode: boolean
+) {
   // 파일 전체를 버퍼로 읽기 (파일 크기가 큰 경우 스트림 처리 고려)
   const uint8Array = new Uint8Array(data);
   let offset = 0;
@@ -78,8 +82,29 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
     const payloadStr = new TextDecoder().decode(payload);
     const strippedPayloadStr = stripAll(payloadStr);
 
+    if (!strippedPayloadStr) {
+      frameIndex++;
+      continue;
+    }
+
+    if (isRegexMode) {
+      const regex = new RegExp(searchText);
+      if (regex.test(strippedPayloadStr)) {
+        results.push({
+          frame: frameIndex,
+          timestamp: { sec, usec },
+          relativeTimestamp: {
+            sec: relativeSec,
+            usec: relativeUsec,
+            time: relativeTime,
+          },
+          textSnippet: strippedPayloadStr.slice(0, 100), // 일부 내용만 미리보기
+        });
+      }
+    }
+
     if (
-      strippedPayloadStr &&
+      !isRegexMode &&
       strippedPayloadStr.length >= searchText.length &&
       strippedPayloadStr
         .toLocaleLowerCase()
@@ -96,8 +121,10 @@ function searchTtyrec(data: ArrayBuffer, searchText: string) {
         textSnippet: strippedPayloadStr.slice(0, 100), // 일부 내용만 미리보기
       });
     }
+
     frameIndex++;
   }
+
   return results;
 }
 

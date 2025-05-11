@@ -12,6 +12,7 @@ type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
   file: Blob | File | null;
   decompressStatus: States;
+  isRegexMode: boolean;
 };
 
 const timeFormatter = (time: number) => {
@@ -30,11 +31,17 @@ const timeFormatter = (time: number) => {
   return `${minutes}:${seconds}`;
 };
 
-const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
+const Search = ({
+  playerRef,
+  file,
+  decompressStatus,
+  isRegexMode,
+}: SearchProps) => {
   const {
     status: searchStatus,
     result: searchResult,
     search,
+    // error,
   } = useSearchWorker();
   const [searchText, setSearchText] = useState("");
   const [showWarningDialog, setShowWarningDialog] = useState(false);
@@ -75,7 +82,11 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
     if (file === null) return;
 
     const buffer = await file.arrayBuffer();
-    await search(buffer, searchText || "ready to make a new sacrifice");
+    await search(
+      buffer,
+      searchText || "ready to make a new sacrifice",
+      isRegexMode
+    );
     setPendingSearch(false);
   };
 
@@ -177,6 +188,17 @@ const Search = ({ playerRef, file, decompressStatus }: SearchProps) => {
             <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
           </div>
         )}
+      {/* {searchStatus === SearchStates.ERROR && (
+        <Card className="p-4 rounded-sm flex gap-2">
+          <p className="text-sm text-red-500">
+            검색 중 오류가 발생했습니다.
+            <br />
+            <pre className="text-xs mt-1 text-muted-foreground whitespace-pre-wrap text-start">
+              {error}
+            </pre>
+          </p>
+        </Card>
+      )} */}
     </div>
   );
 };

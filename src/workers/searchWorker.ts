@@ -15,7 +15,11 @@ const updateState = (state: State) => {
 self.onmessage = async (e: MessageEvent<Message>) => {
   try {
     if (e.data.type === MessageType.SEARCH) {
-      const results = search(e.data.data, e.data.searchText);
+      const results = search(
+        e.data.data,
+        e.data.searchText,
+        e.data.isRegexMode
+      );
 
       // 결과 전송
       postMessage({

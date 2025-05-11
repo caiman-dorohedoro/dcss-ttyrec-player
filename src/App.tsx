@@ -38,6 +38,7 @@ const App = () => {
   const [isMergeMode, setIsMergeMode] = useState<boolean>(false);
   const [isMerging, setIsMerging] = useState<boolean>(false);
   const [isMergedFile, setIsMergedFile] = useState<boolean>(false);
+  const [isRegexMode, setIsRegexMode] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [dialogTitle, setDialogTitle] = useState<string>("");
   const [dialogDescription, setDialogDescription] = useState<string>("");
@@ -354,6 +355,22 @@ const App = () => {
                   />
                 </div>
               )}
+              {tab === "search" && (
+                <div className="flex items-center hover:cursor-pointer hover:text-gray-700">
+                  <Label
+                    htmlFor="regex-mode"
+                    className="hover:cursor-pointer pr-2"
+                  >
+                    정규표현식
+                  </Label>
+                  <Switch
+                    id="regex-mode"
+                    className="hover:cursor-pointer hover:text-gray-500"
+                    checked={isRegexMode}
+                    onCheckedChange={setIsRegexMode}
+                  />
+                </div>
+              )}
             </div>
             <TabsContent value="playlist">
               <div className="flex flex-col gap-2">
@@ -398,6 +415,7 @@ const App = () => {
                 playerRef={playerRef}
                 file={safeFile}
                 decompressStatus={status}
+                isRegexMode={isRegexMode}
               />
             </TabsContent>
           </Tabs>

@@ -62,7 +62,7 @@ const useBz2DecompressWorker = () => {
   }, []);
 
   const search = useCallback(
-    async (data: ArrayBuffer, searchText: string) => {
+    async (data: ArrayBuffer, searchText: string, isRegexMode: boolean) => {
       if (!worker) return;
 
       try {
@@ -73,6 +73,7 @@ const useBz2DecompressWorker = () => {
           type: MessageType.SEARCH,
           data,
           searchText,
+          isRegexMode,
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");

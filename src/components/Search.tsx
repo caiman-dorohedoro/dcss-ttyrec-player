@@ -41,7 +41,7 @@ const Search = ({
     status: searchStatus,
     result: searchResult,
     search,
-    // error,
+    error,
   } = useSearchWorker();
   const [searchText, setSearchText] = useState("");
   const [showWarningDialog, setShowWarningDialog] = useState(false);
@@ -188,7 +188,7 @@ const Search = ({
             <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
           </div>
         )}
-      {/* {searchStatus === SearchStates.ERROR && (
+      {searchStatus === SearchStates.ERROR && (
         <Card className="p-4 rounded-sm flex gap-2">
           <p className="text-sm text-red-500">
             검색 중 오류가 발생했습니다.
@@ -198,7 +198,7 @@ const Search = ({
             </pre>
           </p>
         </Card>
-      )} */}
+      )}
     </div>
   );
 };

@@ -58,7 +58,7 @@ const Playlist: React.FC<PlaylistProps> = ({
   ) => {
     if (isMerging) return;
 
-    e.stopPropagation(); // 이벤트 버블링 방지
+    e.stopPropagation(); // Prevent event bubbling
     onFileRemove(index);
   };
 

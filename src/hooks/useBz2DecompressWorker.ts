@@ -37,11 +37,11 @@ const useBz2DecompressWorker = () => {
       }
 
       if (e.data.type === WorkerOutgoingMessageType.DECOMPRESS_RESULT) {
-        // 단일 파일 압축 해제 결과
+        // Single file decompression result
         if ("data" in e.data) {
           setResult(e.data.data || null);
         }
-        // 배치 파일 압축 해제 결과
+        // Batch file decompression result
         else if ("batchData" in e.data && "originalFiles" in e.data) {
           setBatchResults({
             blobs: e.data.batchData,
@@ -93,7 +93,7 @@ const useBz2DecompressWorker = () => {
 
     setWorker(w);
 
-    // 초기 캐시 상태 요청
+    // Request initial cache state
     w.postMessage({ type: WorkerOutgoingMessageType.CACHE_STATS_RESULT });
 
     // cleanup
@@ -119,7 +119,7 @@ const useBz2DecompressWorker = () => {
     [worker]
   );
 
-  // 새로운 함수: 여러 파일 동시에 압축 해제
+  // decompress multiple files simultaneously
   const decompressBatch = useCallback(
     async (files: File[]) => {
       if (!worker) return;
@@ -152,7 +152,7 @@ const useBz2DecompressWorker = () => {
     error,
     cacheStats,
     decompressFile,
-    decompressBatch, // 새로운 함수 export
+    decompressBatch,
     clearCache,
     cachedFileNames,
   };

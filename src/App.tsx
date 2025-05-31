@@ -45,8 +45,8 @@ const App = () => {
 
   const handleFilesSelect = (files: File[]) => {
     setSelectedFiles(files);
-    setCurrentFileIndex(0); // 파일 선택 시 첫 번째 파일부터 재생 시작
-    setSelectedMergeFiles([]); // 파일 선택 시 병합 모드 해제
+    setCurrentFileIndex(0); // Start playing from first file when files are selected
+    setSelectedMergeFiles([]); // Exit merge mode when files are selected
     setIsMergeMode(false);
     setIsMergedFile(false);
   };
@@ -55,10 +55,10 @@ const App = () => {
     if (currentFileIndex < selectedFiles.length - 1) {
       setCurrentFileIndex(currentFileIndex + 1);
     } else {
-      // 마지막 파일 재생 완료 후 처리 (예: 재생 중지, 반복 재생 등)
+      // Handle after last file playback is completed (e.g., stop playback, repeat playback, etc.)
       console.log("Playlist finished");
-      setCurrentFileIndex(0); // 예시: playlist finished 후 다시 처음 파일부터 재생
-      setSelectedFiles([]); // 예시: playlist finished 후 파일 목록 초기화
+      setCurrentFileIndex(0); // Example: start from first file again after playlist finished
+      setSelectedFiles([]); // Example: clear file list after playlist finished
     }
   };
 
@@ -71,12 +71,12 @@ const App = () => {
 
     if (indexToRemove === currentFileIndex) {
       if (updatedFiles.length > 0) {
-        setCurrentFileIndex(0); // 삭제된 파일이 현재 파일이면, 다음 파일 (또는 첫 번째 파일) 재생
+        setCurrentFileIndex(0); // If deleted file is current file, play next file (or first file)
       } else {
-        setSelectedFiles([]); // 파일 모두 삭제되면 selectedFiles 초기화
+        setSelectedFiles([]); // Clear selectedFiles when all files are deleted
       }
     } else if (indexToRemove < currentFileIndex) {
-      setCurrentFileIndex(currentFileIndex - 1); // 현재 index 조정
+      setCurrentFileIndex(currentFileIndex - 1); // Adjust current index
     }
   };
 
@@ -90,21 +90,21 @@ const App = () => {
     }
   };
 
-  // 파일 병합 함수
+  // File merge function
   const handleMergeFiles = async () => {
     setIsMerging(true);
 
     try {
-      // 압축 파일이 있는지 확인
+      // Check if there are compressed files
       const compressedFiles = selectedMergeFiles.filter((file) =>
         file.name.endsWith(".bz2")
       );
 
       if (compressedFiles.length > 0) {
-        // 압축 파일이 있는 경우 모두 압축 해제 먼저 진행
+        // If there are compressed files, decompress all first
         await decompressBatch(compressedFiles);
       } else {
-        // 압축 파일이 없는 경우 바로 병합 진행
+        // If no compressed files, proceed with merge directly
         await processMergeWithFiles(selectedMergeFiles);
       }
     } catch (error) {
@@ -116,21 +116,21 @@ const App = () => {
     }
   };
 
-  // 압축 해제된 파일 결과를 처리하는 함수
+  // Function to handle decompressed file results
   const processMergeWithDecompressedFiles = async () => {
     if (!batchResults) return;
 
     try {
-      // 압축 해제된 파일과 기존 비압축 파일 합치기
+      // Merge decompressed files with existing uncompressed files
       const nonCompressedFiles = selectedMergeFiles.filter(
         (file) => !file.name.endsWith(".bz2")
       );
 
-      // 압축 해제된 파일과 비압축 파일 합치기
+      // Merge decompressed files with uncompressed files
       const allFiles = [
         ...nonCompressedFiles,
         ...batchResults.blobs.map((blob, index) => {
-          // 원본 파일명에서 .bz2 확장자 제거
+          // Remove .bz2 extension from original filename
           const originalName = batchResults.originalFiles[index].name;
           const cleanName = originalName.endsWith(".bz2")
             ? originalName.slice(0, -4)
@@ -140,7 +140,7 @@ const App = () => {
         }),
       ];
 
-      // 병합 처리
+      // Merge processing
       await processMergeWithFiles(allFiles);
     } catch (error) {
       console.error("압축 해제 후 병합 중 오류 발생:", error);
@@ -151,7 +151,7 @@ const App = () => {
     }
   };
 
-  // 실제 파일 병합을 처리하는 함수
+  // Function to handle actual file merging
   const processMergeWithFiles = async (files: File[]) => {
     try {
       const fileBuffers = await Promise.all(
@@ -182,14 +182,14 @@ const App = () => {
         type: "application/octet-stream",
       });
 
-      // 병합된 파일을 선택된 파일 목록으로 설정
+      // Set merged file as selected file list
       setSelectedFiles([mergedFile]);
       setCurrentFileIndex(0);
       setSelectedMergeFiles([]);
       setIsMergeMode(false);
       setIsMergedFile(true);
 
-      // 성공 메시지
+      // Success message
       setDialogTitle("파일 병합 완료");
       setDialogDescription("파일이 성공적으로 병합되었습니다.");
       setShowDialog(true);
@@ -203,7 +203,7 @@ const App = () => {
     }
   };
 
-  // 파일 버퍼 로드 함수
+  // File buffer loading function
   const loadFileBuffer = async (file: File | Blob): Promise<ArrayBuffer> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -272,7 +272,7 @@ const App = () => {
     }
   }, [status, result]);
 
-  // 배치 압축 해제 결과 감시를 위한 새로운 useEffect
+  // New useEffect to monitor batch decompression results
   useEffect(() => {
     if (batchResults && isMerging) {
       processMergeWithDecompressedFiles();

@@ -21,17 +21,14 @@ self.onmessage = async (e: MessageEvent<Message>) => {
         e.data.isRegexMode
       );
 
-      // 결과 전송
       postMessage({
         type: MessageType.DATA,
         data: results,
       });
 
-      // 상태 업데이트: 완료
       updateState(States.COMPLETED);
     }
   } catch (error) {
-    // 상태 업데이트: 에러
     updateState(States.ERROR);
 
     postMessage({

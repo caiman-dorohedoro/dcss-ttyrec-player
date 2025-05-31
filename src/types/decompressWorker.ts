@@ -100,7 +100,7 @@ export type WorkerIncomingMessage =
   | ClearCacheMessage
   | DecompressBatchMessage;
 
-// 타입 가드
+// Type guards
 export const isDecompressMessage = (
   e: MessageEvent<WorkerIncomingMessage>
 ): e is MessageEvent<DecompressMessage> => {

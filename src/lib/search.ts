@@ -39,25 +39,25 @@ export type TtyrecSearchResult = {
   textSnippet: string;
 };
 
-// ttyrec 파일에서 특정 텍스트를 검색하는 함수
+// Function to search for specific text in ttyrec file
 function searchTtyrec(
   data: ArrayBuffer,
   searchText: string,
   isRegexMode: boolean
 ) {
-  // 파일 전체를 버퍼로 읽기 (파일 크기가 큰 경우 스트림 처리 고려)
+  // Read entire file as buffer (consider stream processing for large files)
   const uint8Array = new Uint8Array(data);
   let offset = 0;
   let frameIndex = 0;
-  let firstTimestamp = null; // 첫 프레임 타임스탬프 저장
+  let firstTimestamp = null; // Store first frame timestamp
   const results: TtyrecSearchResult[] = [];
 
-  // 버퍼 끝까지 반복
+  // Loop until end of buffer
   while (offset < uint8Array.length) {
-    // 헤더가 12바이트 필요 (초, 마이크로초, 데이터 길이)
+    // Header requires 12 bytes (seconds, microseconds, data length)
     if (offset + 12 > uint8Array.length) break;
 
-    // 각 필드를 읽음 (리틀 엔디안으로 가정)
+    // Read each field (assuming little endian)
     const view = new DataView(uint8Array.buffer);
     const sec = view.getUint32(offset, true);
     const usec = view.getUint32(offset + 4, true);
@@ -68,17 +68,17 @@ function searchTtyrec(
       firstTimestamp = { sec, usec };
     }
 
-    // 상대 시간 계산: (현재 초 - 시작 초) + (현재 usec - 시작 usec) / 1e6
+    // Calculate relative time: (current sec - start sec) + (current usec - start usec) / 1e6
     const relativeSec = sec - firstTimestamp.sec;
     const relativeUsec = usec - firstTimestamp.usec;
     const relativeTime = relativeSec + relativeUsec / 1e6;
 
-    // 페이로드가 충분한지 확인
+    // Check if payload is sufficient
     if (offset + len > uint8Array.length) break;
     const payload = uint8Array.slice(offset, offset + len);
     offset += len;
 
-    // 페이로드를 문자열로 변환 (VT100 제어문자가 포함될 수 있음)
+    // Convert payload to string (may contain VT100 control characters)
     const payloadStr = new TextDecoder().decode(payload);
     const strippedPayloadStr = stripAll(payloadStr);
 
@@ -98,7 +98,7 @@ function searchTtyrec(
             usec: relativeUsec,
             time: relativeTime,
           },
-          textSnippet: strippedPayloadStr.slice(0, 100), // 일부 내용만 미리보기
+          textSnippet: strippedPayloadStr.slice(0, 100), // Preview only part of content
         });
       }
     }
@@ -118,7 +118,7 @@ function searchTtyrec(
           usec: relativeUsec,
           time: relativeTime,
         },
-        textSnippet: strippedPayloadStr.slice(0, 100), // 일부 내용만 미리보기
+        textSnippet: strippedPayloadStr.slice(0, 100), // Preview only part of content
       });
     }
 

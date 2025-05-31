@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { Upload } from "lucide-react";
 
-// FileUploader 컴포넌트
 const FileUploader = ({
   onFileSelect,
 }: {
@@ -27,26 +26,27 @@ const FileUploader = ({
   };
 
   const handleFiles = (files: File[]) => {
-    // files: File[] 타입으로 변경
-    if (!files || files.length === 0) return; // files 가 비어있는 경우 처리
+    if (!files || files.length === 0) return;
 
     const validFiles = files.filter(
       (file) =>
         file.name.endsWith(".ttyrec") || file.name.endsWith(".ttyrec.bz2")
-    ); // 유효한 파일만 필터링
+    );
+
     if (validFiles.length !== files.length) {
-      // 유효하지 않은 파일이 있는 경우 alert 표시
       alert("Please upload .ttyrec or .ttyrec.bz2 files only.");
       return;
     }
 
-    onFileSelect(validFiles); // 유효한 파일들만 onFileSelect 으로 전달
+    onFileSelect(validFiles);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    handleFiles(Array.from(files)); // FileList -> Array<File> 로 변환하여 handleFiles 호출
+
+    // Convert FileList to Array<File> and call handleFiles
+    handleFiles(Array.from(files));
   };
 
   return (

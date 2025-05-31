@@ -34,7 +34,7 @@ const TtyrecPlayer = ({
     const initPlayer = async () => {
       if (!file || !containerRef.current) return;
 
-      // 기존 player 정리
+      // Clean up existing player
       if (playerRef.current) {
         playerRef.current.dispose();
         playerRef.current = null;

@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import SearchWorker from "@/workers/searchWorker?worker";
 import { TtyrecSearchResult } from "@/lib/search";
 
-// relativeTimestamp.time의 차이가 1초 미만인 경우 하나의 결과로 병합
+// Merge results if relativeTimestamp.time difference is less than 1 second
 const simplifySearchResult = (result: TtyrecSearchResult[]) => {
   if (result.length === 0) return [];
 

@@ -1,15 +1,15 @@
-// TTYRec 프레임 타입 정의
-interface TtyrecFrame {
-  sec: number; // 초
-  usec: number; // 마이크로초
-  len: number; // 데이터 길이
-  data: Uint8Array; // 데이터
-}
+// TTYRec frame type definition
+type TtyrecFrame = {
+  sec: number; // seconds
+  usec: number; // microseconds
+  len: number; // data length
+  data: Uint8Array; // data
+};
 
 /**
- * 여러 ttyrec 파일을 하나로 합치는 함수
- * @param files ArrayBuffer 형태의 ttyrec 파일 배열
- * @returns 합쳐진 ttyrec 파일 (ArrayBuffer)
+ * Function to merge multiple ttyrec files into one
+ * @param files ArrayBuffers
+ * @returns Merged ttyrec file (ArrayBuffer)
  */
 const mergeTtyrecFiles = (files: ArrayBuffer[]): ArrayBuffer => {
   const mergedFrames: TtyrecFrame[] = [];
@@ -62,14 +62,14 @@ const mergeTtyrecFiles = (files: ArrayBuffer[]): ArrayBuffer => {
 
     currentSec = newFrames[newFrames.length - 1].sec + 1;
 
-    // 대량의 배열을 spread 연산자로 합치면 stack overflow가 발생할 수 있음
-    // mergedFrames.push(...newFrames); 대신 for 루프 사용
+    // Spreading large arrays can cause stack overflow
+    // Use for loop instead of mergedFrames.push(...newFrames);
     for (let i = 0; i < newFrames.length; i++) {
       mergedFrames.push(newFrames[i]);
     }
   });
 
-  // 합쳐진 프레임을 바이너리 데이터로 변환
+  // Convert merged frames to binary data
   const totalLength = mergedFrames.reduce(
     (acc, frame) => acc + 12 + frame.len,
     0

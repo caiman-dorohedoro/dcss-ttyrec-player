@@ -37,7 +37,7 @@ function concatBuffers(buffers: ArrayBuffer[]): ArrayBuffer {
 
 describe("mergeTtyrecFiles", () => {
   it("should merge ttyrec files correctly, exact case", () => {
-    // 개별 프레임 대신 파일 사용
+    // Use files instead of individual frames
     const file1 = createTtyrecFiles([{ sec: 1, usec: 0, text: "record 1" }]);
     const file2 = createTtyrecFiles([{ sec: 2, usec: 0, text: "record 2" }]);
     const file3 = createTtyrecFiles([{ sec: 3, usec: 0, text: "record 3" }]);
@@ -73,7 +73,7 @@ describe("mergeTtyrecFiles", () => {
   });
 
   it("should merge ttyrec files correctly, different time diff - 1", () => {
-    // 개별 프레임 대신 파일 사용
+    // Use files instead of individual frames
     const file1 = createTtyrecFiles([
       {
         sec: new Date("2025-03-20T12:00:00.000Z").getTime(),
@@ -162,7 +162,7 @@ describe("mergeTtyrecFiles", () => {
       { sec: 102, usec: 1000, text: "3 record 3" },
     ];
 
-    // 각 파일의 모든 프레임을 하나의 연속된 버퍼로 만듭니다
+    // Create one continuous buffer from all frames of each file
     const file1Buffer = createTtyrecFiles(frames1);
     const file2Buffer = createTtyrecFiles(frames2);
     const file3Buffer = createTtyrecFiles(frames3);

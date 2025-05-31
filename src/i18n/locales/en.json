@@ -1,0 +1,31 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "settings": "Settings"
+  },
+  "player": {
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "speed": "Speed",
+    "fullscreen": "Fullscreen",
+    "volume": "Volume"
+  },
+  "file": {
+    "upload": "Upload File",
+    "select": "Select File",
+    "drop": "Drop file here",
+    "invalid": "Invalid file format",
+    "size_limit": "File size too large"
+  }
+}

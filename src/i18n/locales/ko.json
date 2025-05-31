@@ -1,0 +1,31 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "cancel": "취소",
+    "confirm": "확인",
+    "close": "닫기",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "add": "추가",
+    "search": "검색",
+    "settings": "설정"
+  },
+  "player": {
+    "play": "재생",
+    "pause": "일시정지",
+    "stop": "정지",
+    "speed": "속도",
+    "fullscreen": "전체화면",
+    "volume": "볼륨"
+  },
+  "file": {
+    "upload": "파일 업로드",
+    "select": "파일 선택",
+    "drop": "여기에 파일을 드롭하세요",
+    "invalid": "잘못된 파일 형식",
+    "size_limit": "파일 크기가 너무 큽니다"
+  }
+}

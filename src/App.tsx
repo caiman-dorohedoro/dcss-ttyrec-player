@@ -16,6 +16,7 @@ import { Label } from "./components/ui/label";
 import mergeTtyrecFiles from "./lib/mergeTtyrecs";
 import Dialog from "./components/Dialog";
 import Shortcuts from "./components/Shortcuts";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -281,7 +282,7 @@ const App = () => {
 
   return (
     <div className="relative mx-auto xl:py-8 py-4">
-      <div className="flex justify-end gap-2 mb-2">
+      <div className="flex justify-end items-center gap-2 mb-2">
         {cacheStats && (
           <>
             <div className="text-xs text-gray-500 text-right">
@@ -291,6 +292,7 @@ const App = () => {
             <div className="bg-gray-200 w-[1px] h-3 self-center"></div>
           </>
         )}
+        <LanguageSwitcher />
         <div className="text-right text-xs text-gray-500 lg:mr-0 mr-2">
           <a
             href="https://github.com/caiman-dorohedoro/dcss-ttyrec-player"

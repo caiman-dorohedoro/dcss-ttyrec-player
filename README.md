@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./logo.png" alt="Ttyrec Player" />
+  <img width="400" src="./logo.png" alt="Ttyrec Player" />
 </div>
 
 ## Screenshot

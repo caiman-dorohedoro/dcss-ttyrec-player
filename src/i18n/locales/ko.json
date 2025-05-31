@@ -1,31 +1,45 @@
 {
   "common": {
-    "loading": "로딩 중...",
-    "error": "오류",
-    "success": "성공",
-    "cancel": "취소",
-    "confirm": "확인",
-    "close": "닫기",
-    "save": "저장",
-    "delete": "삭제",
-    "edit": "편집",
-    "add": "추가",
-    "search": "검색",
-    "settings": "설정"
+    "reset": "초기화"
   },
   "player": {
-    "play": "재생",
-    "pause": "일시정지",
-    "stop": "정지",
-    "speed": "속도",
-    "fullscreen": "전체화면",
-    "volume": "볼륨"
+    "unzipping": "압축 해제중...",
+    "merging": "파일 병합 중..."
   },
-  "file": {
-    "upload": "파일 업로드",
-    "select": "파일 선택",
-    "drop": "여기에 파일을 드롭하세요",
-    "invalid": "잘못된 파일 형식",
-    "size_limit": "파일 크기가 너무 큽니다"
+  "sidebar": {
+    "unzipped_cache": "압축 해제 캐시",
+    "playlist": "플레이리스트",
+    "search": "검색",
+    "merge_mode": "병합 모드",
+    "regex_mode": "정규표현식",
+    "select_all": "전체 선택",
+    "merge": "파일 병합",
+    "download": "다운로드"
+  },
+  "shortcuts": {
+    "title": "키보드 단축키",
+    "play_pause": "플레이 / 정지",
+    "fullscreen": "전체 화면 모드 전환",
+    "rewind_fast_forward": "5초 뒤로 / 5초 앞으로",
+    "rewind_fast_forward_10": "10% 뒤로 / 10% 앞으로",
+    "jump_to_previous_next_marker": "이전 / 다음 마크로 이동",
+    "jump_to_0_10_20_90": "0%, 10%, 20% ... 90%로 이동",
+    "step_back_forward_frame_by_frame": "(일시정지 상태에서) 프레임 단위로 뒤로 / 앞으로",
+    "toggle_help_popup": "도움말 표시 / 숨김"
+  },
+  "dialog": {
+    "merge_success": {
+      "title": "파일 병합 완료",
+      "description": "파일이 성공적으로 병합되었습니다."
+    }
+  },
+  "search": {
+    "warning": {
+      "title": "검색어 확인",
+      "description": "검색어가 비어있거나 너무 짧아 검색에 오래 걸릴 수 있습니다 (3글자 이상 권장). 계속 진행하시겠습니까?"
+    }
+  },
+  "fileUploader": {
+    "dragAndDrop": "<code>.ttyrec</code> 혹은 <code>.ttyrec.bz2</code> 파일을 드래그앤드롭하거나 클릭하여 선택해주세요."
   }
 }

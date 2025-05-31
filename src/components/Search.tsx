@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import Dialog from "@/components/Dialog";
+import { useTranslation } from "react-i18next";
 
 type SearchProps = {
   playerRef: RefObject<{ seek: (timestamp: number) => void }>;
@@ -37,6 +38,7 @@ const Search = ({
   decompressStatus,
   isRegexMode,
 }: SearchProps) => {
+  const { t } = useTranslation();
   const {
     status: searchStatus,
     result: searchResult,
@@ -123,16 +125,15 @@ const Search = ({
             searchStatus === SearchStates.SEARCHING
           }
         >
-          검색
+          {t("sidebar.search")}
         </Button>
       </div>
 
       <Dialog
         open={showWarningDialog}
         onOpenChange={setShowWarningDialog}
-        title="검색어 확인"
-        description="검색어가 비어있거나 너무 짧아 검색에 오래 걸릴 수 있습니다 (3글자
-              이상 권장). 계속 진행하시겠습니까?"
+        title={t("search.warning.title")}
+        description={t("search.warning.description")}
         onCancel={() => {
           setPendingSearch(false);
           setShowWarningDialog(false);

@@ -13,7 +13,7 @@ const LanguageSwitcher = () => {
       onClick={toggleLanguage}
       className="px-1 hover:cursor-pointer leading-none transition-colors hover:bg-blue-100"
     >
-      {i18n.language === "ko" ? "🇺🇸" : "🇰🇷"}
+      {i18n.language === "ko" ? "🇰🇷" : "🇺🇸"}
     </button>
   );
 };

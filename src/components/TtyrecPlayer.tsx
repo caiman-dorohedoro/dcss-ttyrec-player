@@ -2,6 +2,7 @@ import { useRef, useEffect, useImperativeHandle, RefObject } from "react";
 import * as AsciinemaPlayer from "asciinema-player";
 import "asciinema-player/dist/bundle/asciinema-player.css";
 import { States } from "@/types/decompressWorker";
+import { useTranslation } from "react-i18next";
 
 const TtyrecPlayer = ({
   ref,
@@ -14,6 +15,7 @@ const TtyrecPlayer = ({
   status: States;
   onEnded: () => void;
 }) => {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
@@ -73,8 +75,7 @@ const TtyrecPlayer = ({
     <div className="w-full max-w-4xl mx-auto">
       {status === States.DECOMPRESSING && (
         <div className="bg-gray-100 max-w-[896px] mx-auto lg:rounded-lg p-4">
-          {/* <p>Decompressing...</p> */}
-          <p>압축 해제중...</p>
+          <p>{t("player.unzipping")}</p>
         </div>
       )}
       {status !== States.DECOMPRESSING && (

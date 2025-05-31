@@ -17,6 +17,7 @@ import mergeTtyrecFiles from "./lib/mergeTtyrecs";
 import Dialog from "./components/Dialog";
 import Shortcuts from "./components/Shortcuts";
 import LanguageSwitcher from "./components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const App = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -33,6 +34,7 @@ const App = () => {
     clearCache,
     cachedFileNames,
   } = useBz2DecompressWorker();
+  const { t } = useTranslation();
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const playerRef = useRef<any>(null);
   const [selectedMergeFiles, setSelectedMergeFiles] = useState<File[]>([]);
@@ -191,8 +193,8 @@ const App = () => {
       setIsMergedFile(true);
 
       // Success message
-      setDialogTitle("파일 병합 완료");
-      setDialogDescription("파일이 성공적으로 병합되었습니다.");
+      setDialogTitle(t("dialog.merge_success.title"));
+      setDialogDescription(t("dialog.merge_success.description"));
       setShowDialog(true);
     } catch (error) {
       console.error("파일 병합 중 오류 발생:", error);
@@ -286,7 +288,8 @@ const App = () => {
         {cacheStats && (
           <>
             <div className="text-xs text-gray-500 text-right">
-              압축 해제 캐시: {formatSize(cacheStats.currentSize)} /{" "}
+              {t("sidebar.unzipped_cache")}:{" "}
+              {formatSize(cacheStats.currentSize)} /{" "}
               {formatSize(cacheStats.maxSize)}
             </div>
             <div className="bg-gray-200 w-[1px] h-3 self-center"></div>
@@ -312,7 +315,7 @@ const App = () => {
           <div className="absolute right-[20px] lg:-right-[150px] flex gap-2">
             <Button size="sm" onClick={handleReset} className="cursor-pointer">
               <RotateCcw className="w-4 h-4" />
-              <span className="hidden lg:inline"> 초기화</span>
+              <span className="hidden lg:inline">{t("common.reset")}</span>
             </Button>
           </div>
         )}
@@ -334,10 +337,10 @@ const App = () => {
             <div className="flex items-center justify-between">
               <TabsList>
                 <TabsTrigger value="playlist" className="hover:cursor-pointer">
-                  플레이리스트
+                  {t("sidebar.playlist")}
                 </TabsTrigger>
                 <TabsTrigger value="search" className="hover:cursor-pointer">
-                  검색
+                  {t("sidebar.search")}
                 </TabsTrigger>
               </TabsList>
               {tab === "playlist" && (
@@ -346,7 +349,7 @@ const App = () => {
                     htmlFor="merge-mode"
                     className="hover:cursor-pointer pr-2"
                   >
-                    병합 모드
+                    {t("sidebar.merge_mode")}
                   </Label>
                   <Switch
                     id="merge-mode"
@@ -363,7 +366,7 @@ const App = () => {
                     htmlFor="regex-mode"
                     className="hover:cursor-pointer pr-2"
                   >
-                    정규표현식
+                    {t("sidebar.regex_mode")}
                   </Label>
                   <Switch
                     id="regex-mode"
@@ -397,9 +400,9 @@ const App = () => {
                   >
                     {isMerging
                       ? status === States.DECOMPRESSING
-                        ? "압축 해제 중..."
-                        : "파일 병합 중..."
-                      : "파일 병합"}
+                        ? t("player.unzipping")
+                        : t("player.merging")
+                      : t("sidebar.merge")}
                   </Button>
                 )}
                 {status === States.COMPLETED && !isMerging && isMergedFile && (
@@ -407,7 +410,7 @@ const App = () => {
                     className="hover:cursor-pointer"
                     onClick={handleDownload}
                   >
-                    다운로드
+                    {t("sidebar.download")}
                   </Button>
                 )}
               </div>

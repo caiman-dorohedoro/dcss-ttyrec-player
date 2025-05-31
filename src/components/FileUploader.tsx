@@ -1,11 +1,13 @@
 import { useState, useRef } from "react";
 import { Upload } from "lucide-react";
+import { Trans, useTranslation } from "react-i18next";
 
 const FileUploader = ({
   onFileSelect,
 }: {
   onFileSelect: (files: File[]) => void;
 }) => {
+  useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,12 +63,10 @@ const FileUploader = ({
       >
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <p className="mt-2 text-sm text-gray-600">
-          TTYRec 파일을 드래그앤드롭하거나 클릭하여 선택해주세요.
-          {/* Drag and drop your TTYRec file here, or click to select */}
-        </p>
-        <p className="mt-1 text-xs text-gray-500">
-          .ttyrec 및 .ttyrec.bz2 파일을 지원합니다.
-          {/* Supports .ttyrec and .ttyrec.bz2 files */}
+          <Trans
+            i18nKey="fileUploader.dragAndDrop"
+            components={{ code: <code className="bg-gray-100" /> }}
+          />
         </p>
         <input
           type="file"

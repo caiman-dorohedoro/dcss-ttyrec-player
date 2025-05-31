@@ -4,6 +4,7 @@ import { States } from "@/types/decompressWorker";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
+import { useTranslation } from "react-i18next";
 
 interface PlaylistProps {
   className?: string;
@@ -34,6 +35,7 @@ const Playlist: React.FC<PlaylistProps> = ({
   onMergeFileSelect,
   onBatchSelect,
 }) => {
+  const { t } = useTranslation();
   const isCompressedFile = (fileName: string) => {
     return fileName.endsWith(".bz2");
   };
@@ -81,7 +83,7 @@ const Playlist: React.FC<PlaylistProps> = ({
                 }`}
                 htmlFor="batch-select"
               >
-                전체 선택
+                {t("sidebar.select_all")}
               </Label>
             </li>
           )}

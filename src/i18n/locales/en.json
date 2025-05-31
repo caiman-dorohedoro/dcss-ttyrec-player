@@ -1,31 +1,45 @@
 {
   "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "close": "Close",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "search": "Search",
-    "settings": "Settings"
+    "reset": "Reset"
   },
   "player": {
-    "play": "Play",
-    "pause": "Pause",
-    "stop": "Stop",
-    "speed": "Speed",
-    "fullscreen": "Fullscreen",
-    "volume": "Volume"
+    "unzipping": "Unzipping...",
+    "merging": "Merging..."
   },
-  "file": {
-    "upload": "Upload File",
-    "select": "Select File",
-    "drop": "Drop file here",
-    "invalid": "Invalid file format",
-    "size_limit": "File size too large"
+  "sidebar": {
+    "unzipped_cache": "Unzipped Cache",
+    "playlist": "Playlist",
+    "search": "Search",
+    "merge_mode": "Merge Mode",
+    "regex_mode": "Regex Mode",
+    "select_all": "Select All",
+    "merge": "Merge Files",
+    "download": "Download"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "play_pause": "Play / Pause",
+    "fullscreen": "Toggle Fullscreen",
+    "rewind_fast_forward": "Rewind / Fast Forward 5s",
+    "rewind_fast_forward_10": "Rewind / Fast Forward 10%",
+    "jump_to_previous_next_marker": "Jump to Previous / Next Marker",
+    "jump_to_0_10_20_90": "Jump to 0%, 10%, 20% ... 90%",
+    "step_back_forward_frame_by_frame": "Step Back / Forward, Frame by Frame (when paused)",
+    "toggle_help_popup": "Toggle Help Popup"
+  },
+  "dialog": {
+    "merge_success": {
+      "title": "Merge Success",
+      "description": "Files have been successfully merged."
+    }
+  },
+  "search": {
+    "warning": {
+      "title": "Search Warning",
+      "description": "Search term is empty or too short, it may take a long time to search (recommended 3 characters or more). Continue?"
+    }
+  },
+  "fileUploader": {
+    "dragAndDrop": "Drag and drop <code>.ttyrec</code> or <code>.ttyrec.bz2</code> files, or click to select."
   }
 }

@@ -1,3 +1,4 @@
+import { Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const LanguageSwitcher = () => {
@@ -11,9 +12,10 @@ const LanguageSwitcher = () => {
   return (
     <button
       onClick={toggleLanguage}
-      className="px-1 hover:cursor-pointer leading-none transition-colors hover:bg-blue-100"
+      className="text-xs text-[#6a7282] leading-4 flex items-center gap-[2px] min-w-[60px] hover:text-gray-700 hover:cursor-pointer"
     >
-      {i18n.language === "ko" ? "🇰🇷" : "🇺🇸"}
+      <Globe className="w-4 h-4" />
+      {i18n.language === "ko" ? "한국어" : "English"}
     </button>
   );
 };

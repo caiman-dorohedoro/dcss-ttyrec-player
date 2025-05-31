@@ -1,50 +1,22 @@
-# React + TypeScript + Vite
+<div align="center">
+  <img src="./logo.png" alt="Ttyrec Player" />
+</div>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Screenshot
 
-Currently, two official plugins are available:
+<div align="center">
+  <img src="./screenshot.png" alt="Ttyrec Player" />
+</div>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- [x] Play .ttyrec and .ttyrec.bz2 files
+- [x] Playlist
+- [x] Merge multiple ttyrecs (works even when ttyrec and ttyrec.bz2 files are mixed)
+- [x] Search (!!, supports regular expressions)
+- [x] i18n - Korean, English
+- [x] Cache bz2 unzipped results
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Inspired by
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+CNC server's ttyrec Player (examples - https://archive.nemelex.cards/ttyrec/caiman)

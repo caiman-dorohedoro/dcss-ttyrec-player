@@ -35,10 +35,12 @@ const mergeTtyrecFiles = (files: ArrayBuffer[]): ArrayBuffer => {
   fileFrames.forEach((frames) => {
     const [firstFrame] = frames;
     const baseSec = firstFrame.sec;
-    const diffSec = baseSec - currentSec < 1 ? 1 : baseSec - currentSec;
 
     const newFrames = frames.map((frame) => {
-      const sec = currentSec === 0 ? 0 : frame.sec - diffSec;
+      const sec =
+        currentSec === 0
+          ? frame.sec - baseSec // 첫 번째 파일: 0부터 시작하도록 baseSec를 빼기
+          : currentSec + (frame.sec - baseSec); // 이후 파일들: currentSec 기준으로 변환
 
       const result = {
         sec,

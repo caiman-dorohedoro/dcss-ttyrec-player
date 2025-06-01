@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./dark-theme-logo.png" />
-    <source media="(prefers-color-scheme: light)" srcset="./logo.png" />
-    <img alt="Ttyrec Player" src="./logo.png" />
+    <source media="(prefers-color-scheme: dark)" srcset="./logo-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./logo-light.png" />
+    <img width="400" alt="Ttyrec Player" src="./logo-light.png" />
   </picture>
 </p>
 

@@ -88,7 +88,7 @@ function searchTtyrec(
     }
 
     if (isRegexMode) {
-      const regex = new RegExp(searchText);
+      const regex = new RegExp(searchText, "i");
       if (regex.test(strippedPayloadStr)) {
         results.push({
           frame: frameIndex,

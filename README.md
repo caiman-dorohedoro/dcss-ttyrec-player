@@ -77,7 +77,7 @@ Primarily developed for Dungeon Crawl Stone Soup playback, but should support al
 ### Plans & Bug Reports
 
 - Features or Improvements planned include adding files to existing playlists, loading ttyrec files from URLs, and more.
-- Please report any bugs you encounter in [Issues](https://github.com/dcss-ttyrec-player/issues).
+- Please report any bugs you encounter in [Issues](https://github.com/caiman-dorohedoro/dcss-ttyrec-player/issues).
 
 ### Inspired by
 

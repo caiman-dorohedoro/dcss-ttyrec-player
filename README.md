@@ -1,6 +1,10 @@
-<div align="center">
-  <img width="400" src="./logo.png" alt="Ttyrec Player" />
-</div>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./dark-theme-logo.png" />
+    <source media="(prefers-color-scheme: light)" srcset="./logo.png" />
+    <img alt="Ttyrec Player" src="./logo.png" />
+  </picture>
+</p>
 
 ## Screenshot
 
